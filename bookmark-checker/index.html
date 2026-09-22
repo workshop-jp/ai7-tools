@@ -189,7 +189,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,.cta:focus-within{
       <li><span>料金・無料・モデル名・新機能など、変わりやすい話</span><b class="pill lk-check">要チェック</b></li>
       <li><span>手順・方法・テンプレ・使い方など</span><b class="pill lk-ok">現役の可能性大</b></li>
       <li><span>宣伝・誘導・収益自慢など</span><b class="pill lk-no">見なくてOK候補</b></li>
-      <li><span>本文がほとんどなく、中身が分からない</span><b class="pill lk-unk">中身ナゾ</b></li>
+      <li><span>本文がほとんどなく、中身が分からない（Xの記事機能の投稿を含む）</span><b class="pill lk-unk">中身ナゾ</b></li>
     </ul>
     <p class="fine">簡易なルールなので、間違うこともあります。判定は、カードの判定欄で直せます。</p>
   </section>
@@ -294,10 +294,10 @@ function guessGenre(t){
 function classify(r,today){
   var t=r.clean,n=t.length;
   var days=Math.floor((today-r.date)/864e5);
-  if(n<20) return {label:'判定不能',reason:'本文がほとんどなく、リンクや画像の中身が分かりません。'};
+  if(n<20) return {label:'判定不能',reason:'Xの記事、または、リンクや画像だけの投稿である可能性が高いです。一度開いて確認してください。'};
   var strong=PROMO_STRONG.filter(function(x){return x.test(t);}).length;
   var weak=PROMO_WEAK.filter(function(x){return x.test(t);}).length;
-  if(strong>=1||weak>=2) return {label:'不要',reason:'宣伝・誘導・収益の自己申告のような言葉があり、後から使える情報が少ない可能性があります。'};
+  if(strong>=1||weak>=2) return {label:'不要',reason:'宣伝・誘導・収益の自己申告のような言葉があります。ただ、あなたにとっては残しておきたいものかもしれません。見てから判断してください。'};
   var ds=findDates(t,r.date);
   if(ds.length&&EVENT.test(t)){
     var sod=startOfDay(today);
@@ -310,7 +310,7 @@ function classify(r,today){
   var ts=TS.filter(function(x){return x.test(t);}).length;
   if(ts>=2||(ts>=1&&NEWTOOL.test(t))) return {label:'確認が必要',reason:'新しいツールや機能、料金・モデル名など、変わりやすい話題を含みます。今も同じか確認してください。'};
   if(PRACTICAL.test(t)||n>=80) return {label:'使える',reason:'手順や考え方が書かれていて、時期に左右されにくい内容に見えます。'};
-  return {label:'判定不能',reason:'内容が短く、判断する材料が足りません。'};
+  return {label:'判定不能',reason:'Xの記事、または、リンクや画像だけの投稿である可能性が高いです。一度開いて確認してください。'};
 }
 /*CLASSIFY_END*/
 
