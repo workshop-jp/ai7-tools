@@ -94,7 +94,7 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outli
 
 .machine{
   background:linear-gradient(180deg,#5B4636,#3E2F24);
-  border-radius:24px;padding:26px 16px 32px;position:relative;
+  border-radius:24px;padding:26px clamp(70px,20vw,92px) 32px 16px;position:relative;
   box-shadow:0 8px 0 rgba(0,0,0,.18), inset 0 -4px 0 rgba(0,0,0,.25);
 }
 .machine-lights{display:flex;justify-content:space-around;margin-bottom:14px;padding:0 4px}
@@ -129,15 +129,42 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outli
   padding:10px 12px;margin:0 0 12px;
 }
 
-.lever-wrap{display:flex;justify-content:center;margin-top:22px}
-.lever-btn{
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  background:linear-gradient(180deg,#FFD873,var(--yellow));
-  color:#5C3A00;font-weight:800;font-size:21px;padding:18px 36px;border-radius:22px;
-  box-shadow:0 5px 0 var(--yellow-dark);min-height:76px;min-width:260px;justify-content:center;
+.lever{
+  position:absolute;top:14px;right:clamp(10px,4vw,18px);bottom:14px;
+  width:clamp(46px,13vw,62px);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  background:none;padding:0;
 }
-.lever-btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--yellow-dark)}
-.lever-btn[disabled]{opacity:.45;pointer-events:none}
+.lever-mount{
+  width:100%;height:22px;background:linear-gradient(180deg,#8A7360,#5B4636);
+  border-radius:10px 10px 6px 6px;box-shadow:0 3px 0 rgba(0,0,0,.35);flex:0 0 auto;
+}
+.lever-slot{
+  flex:1 1 auto;width:14px;margin-top:-4px;background:#1A130E;border-radius:8px;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.7);position:relative;
+}
+.lever-rod{
+  position:absolute;left:50%;bottom:0;width:11px;height:78%;
+  transform:translateX(-50%);border-radius:8px;
+  background:linear-gradient(90deg,#9AA0A6,#F1F3F4 45%,#9AA0A6);
+  transition:height .2s cubic-bezier(.4,.6,.6,1);
+}
+.lever-knob{
+  position:absolute;left:50%;bottom:78%;width:clamp(38px,10vw,50px);height:clamp(38px,10vw,50px);
+  transform:translate(-50%,50%);border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#FF9E9E,var(--red) 62%,#B23244);
+  box-shadow:0 4px 0 rgba(0,0,0,.35), 0 0 0 4px rgba(255,255,255,.15);
+  transition:bottom .2s cubic-bezier(.4,.6,.6,1);
+}
+.lever:not([disabled]) .lever-knob{animation:leverHint 1.3s ease-in-out infinite}
+@keyframes leverHint{0%,100%{bottom:78%}50%{bottom:66%}}
+.lever.pulled .lever-rod{height:32%}
+.lever.pulled .lever-knob{bottom:32%;animation:none}
+.lever-label{
+  margin-top:8px;font-size:12.5px;font-weight:800;color:#FFE3A6;text-align:center;line-height:1.2;
+}
+.lever[disabled]{opacity:.5}
+.lever[disabled] .lever-knob{animation:none}
 
 .prompt-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 14px}
 .prompt{text-align:center;font-weight:700;font-size:21px;margin:0;color:var(--purple-dark)}
@@ -226,10 +253,14 @@ textarea#nameInput{
     <div class="machine">
       <div class="machine-lights" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
       <div id="reels" class="reels"></div>
-    </div>
-
-    <div class="lever-wrap">
-      <button id="btnLever" class="lever-btn">🎰 レバーを ひく！</button>
+      <button id="btnLever" class="lever" aria-label="レバーを ひいて スロットを まわす">
+        <span class="lever-mount" aria-hidden="true"></span>
+        <span class="lever-slot" aria-hidden="true">
+          <span class="lever-rod"></span>
+          <span class="lever-knob"></span>
+        </span>
+        <span class="lever-label">ひいてね</span>
+      </button>
     </div>
 
     <div id="promptRow" class="prompt-row" hidden>
@@ -271,19 +302,19 @@ textarea#nameInput{
       prompt: "どの どうぶつかな？",
       fallbackIcon: "🐾",
       items: [
-        {word:"いぬ", icon:"🐶"},
-        {word:"ねこ", icon:"🐱"},
-        {word:"うさぎ", icon:"🐰"},
+        {word:"いぬ", icon:"🐕"},
+        {word:"ねこ", icon:"🐈"},
+        {word:"うさぎ", icon:"🐇"},
         {word:"ぞう", icon:"🐘"},
         {word:"きりん", icon:"🦒"},
         {word:"ぱんだ", icon:"🐼"},
         {word:"くま", icon:"🐻"},
         {word:"らいおん", icon:"🦁"},
-        {word:"さる", icon:"🐵"},
-        {word:"とら", icon:"🐯"},
+        {word:"さる", icon:"🐒"},
+        {word:"とら", icon:"🐅"},
         {word:"ひつじ", icon:"🐑"},
-        {word:"うま", icon:"🐴"},
-        {word:"ぶた", icon:"🐷"},
+        {word:"うま", icon:"🐎"},
+        {word:"ぶた", icon:"🐖"},
         {word:"かえる", icon:"🐸"},
         {word:"ぺんぎん", icon:"🐧"},
         {word:"かば", icon:"🦛"}
@@ -623,6 +654,8 @@ textarea#nameInput{
 
   els.btnLever.addEventListener("click", function(){
     if(state.spinning) return;
+    els.btnLever.classList.add("pulled");
+    setTimeout(function(){ els.btnLever.classList.remove("pulled"); }, 260);
     startSpin();
   });
 
