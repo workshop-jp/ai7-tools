@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>だれのなまえ？スロットあてっこゲーム</title>
-<meta name="description" content="ことばあそび用の、スロットマシンみたいに文字が回って止まる、なまえあてゲームです。">
+<title>スロットあてっこゲーム</title>
+<meta name="description" content="ことばあそび用の、スロットマシンみたいに文字がゆっくり回って止まる、カードめくりの当てっこゲームです。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap">
 <style>
@@ -46,54 +46,55 @@ body{
   color:var(--ink);
   font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
   line-height:1.6;
+  font-size:17px;
 }
 button{font:inherit;color:inherit;border:none;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-.wrap{max-width:520px;margin:0 auto;padding:14px 16px 40px;position:relative}
+.wrap{max-width:580px;margin:0 auto;padding:16px 18px 44px;position:relative}
 
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
-.icon-btn{width:44px;height:44px;border-radius:50%;background:var(--panel);border:2px solid var(--line);font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(74,56,38,.12)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.icon-btn{width:50px;height:50px;border-radius:50%;background:var(--panel);border:2px solid var(--line);font-size:23px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(74,56,38,.12)}
 .icon-btn:active{transform:translateY(2px);box-shadow:none}
-.star-badge{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;font-size:16px;box-shadow:0 3px 0 rgba(74,56,38,.12)}
+.star-badge{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:10px 20px;font-weight:700;font-size:19px;box-shadow:0 3px 0 rgba(74,56,38,.12)}
 
 .screen{padding-top:6px}
-.logo{font-weight:800;font-size:26px;text-align:center;margin:10px 0 16px;line-height:1.4}
-.logo .sub{display:block;font-size:16px;font-weight:700;color:var(--pink-dark);margin-top:2px}
+.logo{font-weight:800;font-size:30px;text-align:center;margin:10px 0 18px;line-height:1.4}
+.logo .sub{display:block;font-size:18px;font-weight:700;color:var(--pink-dark);margin-top:2px}
 
-.cat-picker{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:0 0 16px}
-.cat-btn{flex:1 1 auto;min-width:84px;min-height:44px;padding:10px 10px;border-radius:14px;background:var(--panel);border:2px solid var(--line);font-weight:700;font-size:14px;box-shadow:0 3px 0 rgba(74,56,38,.1)}
+.cat-picker{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:0 0 18px}
+.cat-btn{flex:1 1 auto;min-width:100px;min-height:56px;padding:12px 12px;border-radius:16px;background:var(--panel);border:2px solid var(--line);font-weight:700;font-size:17px;box-shadow:0 3px 0 rgba(74,56,38,.1)}
 .cat-btn:active{transform:translateY(2px);box-shadow:none}
 .cat-btn.active{background:var(--teal);border-color:var(--teal-dark);color:#fff}
 
-.panel{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:0 4px 0 rgba(74,56,38,.08)}
-.howto h2{margin:0 0 8px;font-size:17px}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:20px 22px;box-shadow:0 4px 0 rgba(74,56,38,.08)}
+.howto h2{margin:0 0 10px;font-size:19px}
 .howto ol{margin:0;padding-left:1.3em}
-.howto li{margin:6px 0;font-size:15px}
+.howto li{margin:9px 0;font-size:17px}
 
 .cta{
   display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;min-height:60px;margin-top:18px;
+  width:100%;min-height:68px;margin-top:20px;
   background:linear-gradient(180deg,#FF8A9B,var(--pink));
-  color:#fff;font-weight:800;font-size:19px;border-radius:18px;
+  color:#fff;font-weight:800;font-size:21px;border-radius:20px;
   box-shadow:0 5px 0 var(--pink-dark);
 }
 .cta:active{transform:translateY(4px);box-shadow:0 1px 0 var(--pink-dark)}
-.cta.big{font-size:21px;min-height:66px}
+.cta.big{font-size:24px;min-height:76px}
 .cta[disabled]{opacity:.5;pointer-events:none}
 
 .ghost-btn{
-  width:100%;min-height:48px;margin-top:10px;background:var(--panel);
-  border:2px solid var(--line);border-radius:14px;font-weight:700;font-size:15px;color:var(--muted);
+  width:100%;min-height:54px;margin-top:12px;background:var(--panel);
+  border:2px solid var(--line);border-radius:16px;font-weight:700;font-size:16px;color:var(--muted);
 }
-.link-btn{display:block;width:100%;text-align:center;margin-top:16px;color:var(--muted);font-size:14px;text-decoration:underline;padding:8px}
+.link-btn{display:block;width:100%;text-align:center;margin-top:18px;color:var(--muted);font-size:15.5px;text-decoration:underline;padding:10px}
 
-.hud{display:flex;justify-content:space-between;align-items:center;margin:4px 0 14px;font-weight:700}
-.hud .round{background:var(--purple);color:#fff;border-radius:999px;padding:6px 14px;font-size:14px}
-.hud .score{color:var(--yellow-dark);font-size:16px}
+.hud{display:flex;justify-content:space-between;align-items:center;margin:4px 0 16px;font-weight:700}
+.hud .round{background:var(--purple);color:#fff;border-radius:999px;padding:8px 18px;font-size:16px}
+.hud .score{color:var(--yellow-dark);font-size:19px}
 
 .machine{
   background:linear-gradient(180deg,#5B4636,#3E2F24);
-  border-radius:22px;padding:20px 14px 26px;position:relative;
+  border-radius:24px;padding:26px 16px 32px;position:relative;
   box-shadow:0 8px 0 rgba(0,0,0,.18), inset 0 -4px 0 rgba(0,0,0,.25);
 }
 .machine-lights{display:flex;justify-content:space-around;margin-bottom:14px;padding:0 4px}
@@ -102,67 +103,75 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outli
 .machine-lights span:nth-child(3n){animation-delay:.6s;background:var(--teal)}
 @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
 
-.reels{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:10px 6px;background:#2A2019;border-radius:16px;box-shadow:inset 0 3px 8px rgba(0,0,0,.5)}
+.reels{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:16px 12px;background:#2A2019;border-radius:18px;box-shadow:inset 0 3px 8px rgba(0,0,0,.5)}
 .reel{
-  width:clamp(46px,15vw,68px);height:clamp(56px,18vw,80px);
-  background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-size:clamp(26px,8vw,38px);font-weight:800;position:relative;overflow:hidden;
-  border-bottom:5px solid var(--line);
+  width:clamp(66px,21vw,100px);height:clamp(82px,25vw,122px);
+  background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(38px,11vw,58px);font-weight:800;position:relative;overflow:hidden;
+  border-bottom:7px solid var(--line);
 }
 .reel:nth-child(4n+1){border-bottom-color:var(--pink)}
 .reel:nth-child(4n+2){border-bottom-color:var(--teal)}
 .reel:nth-child(4n+3){border-bottom-color:var(--yellow)}
 .reel:nth-child(4n+4){border-bottom-color:var(--purple)}
-.reel .letter{display:block;transition:filter .1s}
-.reel.spinning .letter{filter:blur(3px);opacity:.75}
-.reel.spinning{animation:jiggle .09s linear infinite}
-@keyframes jiggle{0%{transform:translateY(0)}50%{transform:translateY(2px)}100%{transform:translateY(0)}}
-.reel.landed{animation:pop .38s ease}
-@keyframes pop{0%{transform:scale(1.35) rotate(-6deg)}55%{transform:scale(.9) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
-.reel.tricky{box-shadow:inset 0 0 0 3px var(--yellow-dark),0 0 12px 2px rgba(255,201,60,.65);perspective:200px}
-.reel .hint-badge{position:absolute;top:-12px;right:-8px;font-size:16px;animation:badgePulse .6s infinite;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.reel .letter{display:block}
+.reel.spinning{box-shadow:0 0 0 3px rgba(255,255,255,.25) inset}
+.reel.landed{animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(1.32) rotate(-5deg)}55%{transform:scale(.92) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
+.reel.tricky{box-shadow:inset 0 0 0 4px var(--yellow-dark),0 0 14px 3px rgba(255,201,60,.65)}
+.reel .hint-badge{position:absolute;top:-14px;right:-10px;font-size:20px;animation:badgePulse .6s infinite;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
 @keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
-.reel.flip .letter{animation:flipStep .16s ease}
-@keyframes flipStep{0%{transform:rotateX(80deg);opacity:.25}100%{transform:rotateX(0deg);opacity:1}}
+.reel.flip .letter{animation:flipStep .22s ease}
+@keyframes flipStep{0%{transform:rotateX(75deg) scale(.85);opacity:.35}100%{transform:rotateX(0deg) scale(1);opacity:1}}
 .tricky-banner{
-  text-align:center;font-weight:800;font-size:13.5px;color:var(--purple-dark);
-  background:#FDF3D8;border:2px dashed var(--yellow-dark);border-radius:14px;
-  padding:8px 10px;margin:0 0 10px;
+  text-align:center;font-weight:800;font-size:15.5px;color:var(--purple-dark);
+  background:#FDF3D8;border:2px dashed var(--yellow-dark);border-radius:16px;
+  padding:10px 12px;margin:0 0 12px;
 }
 
-.lever-wrap{display:flex;justify-content:center;margin-top:18px}
+.lever-wrap{display:flex;justify-content:center;margin-top:22px}
 .lever-btn{
   display:flex;flex-direction:column;align-items:center;gap:6px;
   background:linear-gradient(180deg,#FFD873,var(--yellow));
-  color:#5C3A00;font-weight:800;font-size:18px;padding:14px 30px;border-radius:20px;
-  box-shadow:0 5px 0 var(--yellow-dark);min-height:64px;min-width:220px;justify-content:center;
+  color:#5C3A00;font-weight:800;font-size:21px;padding:18px 36px;border-radius:22px;
+  box-shadow:0 5px 0 var(--yellow-dark);min-height:76px;min-width:260px;justify-content:center;
 }
 .lever-btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--yellow-dark)}
 .lever-btn[disabled]{opacity:.45;pointer-events:none}
 
-.prompt-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px 0 10px}
-.prompt{text-align:center;font-weight:700;font-size:18px;margin:0;color:var(--purple-dark)}
-.icon-btn.small{width:36px;height:36px;font-size:15px;flex:0 0 auto}
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.choice-btn{
-  min-height:56px;background:var(--panel);border:3px solid var(--line);border-radius:16px;
-  font-weight:800;font-size:19px;box-shadow:0 4px 0 rgba(74,56,38,.1);
-}
-.choice-btn:active{transform:translateY(3px);box-shadow:none}
-.choice-btn.correct{background:var(--green);border-color:var(--green-dark);color:#fff}
-.choice-btn.wrong{background:#FFE1E5;border-color:var(--red);color:var(--red);animation:shake .35s}
-.choice-btn.faded{opacity:.35;pointer-events:none}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.prompt-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 14px}
+.prompt{text-align:center;font-weight:700;font-size:21px;margin:0;color:var(--purple-dark)}
+.icon-btn.small{width:42px;height:42px;font-size:17px;flex:0 0 auto}
 
-.feedback{text-align:center;font-weight:800;font-size:19px;min-height:30px;margin-top:14px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.choice-card{padding:0;min-height:150px;perspective:900px}
+.choice-card .card-inner{
+  position:relative;width:100%;height:150px;transition:transform .5s cubic-bezier(.4,.2,.2,1);
+  transform-style:preserve-3d;
+}
+.choice-card.flipped .card-inner{transform:rotateY(180deg)}
+.card-face{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  border-radius:20px;backface-visibility:hidden;font-weight:800;text-align:center;
+  box-shadow:0 4px 0 rgba(74,56,38,.12);background:var(--panel);border:3px solid var(--line);
+  padding:8px;
+}
+.card-front{font-size:56px}
+.card-back{font-size:clamp(18px,6vw,28px);transform:rotateY(180deg);color:var(--ink)}
+.choice-card.correct .card-back{background:var(--green);border-color:var(--green-dark);color:#fff}
+.choice-card.wrong .card-back{background:#FFE1E5;border-color:var(--red);color:var(--red)}
+.choice-card.faded{opacity:.4;pointer-events:none}
+.color-swatch{width:60px;height:60px;border-radius:50%;box-shadow:inset 0 0 0 3px rgba(0,0,0,.08)}
+
+.feedback{text-align:center;font-weight:800;font-size:21px;min-height:32px;margin-top:16px}
 .feedback.ok{color:var(--green-dark)}
 .feedback.ng{color:var(--pink-dark)}
 
-.settings h2{font-size:18px;margin:6px 0 4px}
-.hint{color:var(--muted);font-size:13.5px;margin:0 0 10px}
+.settings h2{font-size:21px;margin:6px 0 6px}
+.hint{color:var(--muted);font-size:15px;margin:0 0 12px}
 textarea#nameInput{
-  width:100%;min-height:220px;padding:12px;border-radius:14px;border:2px solid var(--line);
-  font-size:16px;font-family:inherit;resize:vertical;background:var(--panel);color:var(--ink);
+  width:100%;min-height:240px;padding:14px;border-radius:16px;border:2px solid var(--line);
+  font-size:17px;font-family:inherit;resize:vertical;background:var(--panel);color:var(--ink);
 }
 .row{display:flex;gap:10px;margin-top:10px}
 .row .cta{margin-top:0}
@@ -197,10 +206,10 @@ textarea#nameInput{
     <div class="panel howto">
       <h2>あそびかた</h2>
       <ol>
-        <li>「レバーを ひく」で スロットが まわるよ</li>
+        <li>あそびたい カテゴリを えらぼう</li>
+        <li>「レバーを ひく」で スロットが ゆっくり まわるよ</li>
         <li>もじが ひとつずつ とまっていくよ</li>
-        <li>とまった もじで、なにか かんがえよう</li>
-        <li>こたえだと おもう ボタンを タップ！</li>
+        <li>とまった もじで なにか かんがえて、カードを タップ！ めくれて こたえが わかるよ</li>
       </ol>
     </div>
     <button id="btnStart" class="cta big">🎮 はじめる</button>
@@ -234,7 +243,7 @@ textarea#nameInput{
   </section>
 
   <section id="screen-settings" class="screen" hidden>
-    <h2><span id="settingsCatLabel">なまえ</span> リストの へんしゅう</h2>
+    <h2><span id="settingsCatLabel">どうぶつ</span> リストの へんしゅう</h2>
     <p class="hint">1ぎょうに ひとつずつ、ひらがなで ことばを にゅうりょくしてね（さいてい 4こ ひつよう）。じぶんの クラスや かぞくに あわせて じゆうに かえて あそべるよ。</p>
     <textarea id="nameInput" spellcheck="false"></textarea>
     <div class="row">
@@ -252,34 +261,73 @@ textarea#nameInput{
 (function(){
   "use strict";
 
-  var LEGACY_STORAGE_KEY = "nameSlotGame.names.v1";
-  var WORDS_KEY_PREFIX = "nameSlotGame.words.v1.";
+  var WORDS_KEY_PREFIX = "nameSlotGame.words.v2.";
   var CATEGORY_KEY = "nameSlotGame.category.v1";
   var MUTE_KEY = "nameSlotGame.muted.v1";
   var CATEGORIES = {
-    name: {
-      label: "なまえ",
-      chip: "👦👧 なまえ",
-      prompt: "だれの なまえかな？",
-      defaultWords: ["れん","ゆい","そら","みお","はると","さくら","ひなた","あおい","ゆうと","いつき","めい","こはる","りく","あかり","たいが","のあ"]
-    },
     animal: {
       label: "どうぶつ",
       chip: "🐰 どうぶつ",
-      prompt: "なんの どうぶつかな？",
-      defaultWords: ["いぬ","ねこ","うさぎ","ぞう","きりん","ぱんだ","くま","らいおん","さる","とら","ひつじ","うま","ぶた","かえる","ぺんぎん","かば"]
+      prompt: "どの どうぶつかな？",
+      fallbackIcon: "🐾",
+      items: [
+        {word:"いぬ", icon:"🐶"},
+        {word:"ねこ", icon:"🐱"},
+        {word:"うさぎ", icon:"🐰"},
+        {word:"ぞう", icon:"🐘"},
+        {word:"きりん", icon:"🦒"},
+        {word:"ぱんだ", icon:"🐼"},
+        {word:"くま", icon:"🐻"},
+        {word:"らいおん", icon:"🦁"},
+        {word:"さる", icon:"🐵"},
+        {word:"とら", icon:"🐯"},
+        {word:"ひつじ", icon:"🐑"},
+        {word:"うま", icon:"🐴"},
+        {word:"ぶた", icon:"🐷"},
+        {word:"かえる", icon:"🐸"},
+        {word:"ぺんぎん", icon:"🐧"},
+        {word:"かば", icon:"🦛"}
+      ]
     },
     fruit: {
       label: "くだもの",
       chip: "🍎 くだもの",
-      prompt: "なんの くだものかな？",
-      defaultWords: ["りんご","ばなな","みかん","いちご","ぶどう","もも","すいか","めろん","なし","かき","さくらんぼ","れもん","びわ","くり"]
+      prompt: "どの くだものかな？",
+      fallbackIcon: "🍽️",
+      items: [
+        {word:"りんご", icon:"🍎"},
+        {word:"ばなな", icon:"🍌"},
+        {word:"みかん", icon:"🍊"},
+        {word:"いちご", icon:"🍓"},
+        {word:"ぶどう", icon:"🍇"},
+        {word:"もも", icon:"🍑"},
+        {word:"すいか", icon:"🍉"},
+        {word:"めろん", icon:"🍈"},
+        {word:"なし", icon:"🍐"},
+        {word:"さくらんぼ", icon:"🍒"},
+        {word:"れもん", icon:"🍋"},
+        {word:"くり", icon:"🌰"}
+      ]
     },
     color: {
       label: "いろ",
       chip: "🎨 いろ",
-      prompt: "なにいろ かな？",
-      defaultWords: ["あか","あお","きいろ","みどり","むらさき","ぴんく","くろ","しろ","ちゃいろ","みずいろ","きんいろ","ぎんいろ"]
+      prompt: "どの いろかな？",
+      fallbackIcon: "🎨",
+      items: [
+        {word:"あか", swatch:"#F0576B"},
+        {word:"あお", swatch:"#4FADE8"},
+        {word:"きいろ", swatch:"#FFC93C"},
+        {word:"みどり", swatch:"#3EC77A"},
+        {word:"むらさき", swatch:"#9B7EDE"},
+        {word:"ぴんく", swatch:"#FF9EC0"},
+        {word:"くろ", swatch:"#333333"},
+        {word:"しろ", swatch:"#FFFFFF", border:"#D8D0C2"},
+        {word:"ちゃいろ", swatch:"#8B5A2B"},
+        {word:"みずいろ", swatch:"#A0E6E0"},
+        {word:"きんいろ", swatch:"#E6C200"},
+        {word:"ぎんいろ", swatch:"#C0C0C0"}
+      ]
     }
   };
   var LETTER_POOL = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ".split("");
@@ -336,10 +384,13 @@ textarea#nameInput{
       var c = localStorage.getItem(CATEGORY_KEY);
       if(c && CATEGORIES[c]) return c;
     }catch(e){}
-    return "name";
+    return "animal";
   }
   function saveCategory(c){
     try{ localStorage.setItem(CATEGORY_KEY, c); }catch(e){}
+  }
+  function defaultWordsFor(category){
+    return CATEGORIES[category].items.map(function(it){ return it.word; });
   }
   function loadWords(category){
     try{
@@ -348,18 +399,16 @@ textarea#nameInput{
         var arr = JSON.parse(raw);
         if(Array.isArray(arr) && arr.length >= 4) return arr;
       }
-      if(category === "name"){
-        var legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-        if(legacy){
-          var larr = JSON.parse(legacy);
-          if(Array.isArray(larr) && larr.length >= 4) return larr;
-        }
-      }
     }catch(e){}
-    return CATEGORIES[category].defaultWords.slice();
+    return defaultWordsFor(category);
   }
   function saveWords(category, arr){
     try{ localStorage.setItem(WORDS_KEY_PREFIX + category, JSON.stringify(arr)); }catch(e){}
+  }
+  function iconForWord(category, word){
+    var found = CATEGORIES[category].items.filter(function(it){ return it.word === word; })[0];
+    if(found) return found;
+    return { word: word, icon: CATEGORIES[category].fallbackIcon };
   }
   function loadMuted(){
     try{ return localStorage.getItem(MUTE_KEY) === "1"; }catch(e){ return false; }
@@ -429,7 +478,7 @@ textarea#nameInput{
   function sndTick(){ beep(880,.08,0,"square",.12); }
   function sndCorrect(){ beep(523,.14,0,"sine"); beep(659,.14,.12,"sine"); beep(784,.22,.24,"sine"); }
   function sndWrong(){ beep(220,.18,0,"sawtooth",.12); beep(180,.22,.1,"sawtooth",.1); }
-  function sndSuspense(step){ beep(300 + step * 35, .09, 0, "triangle", .1); }
+  function sndFlicker(){ beep(700, .05, 0, "square", .07); }
 
   function speak(text, rate, pitch){
     if(state.muted) return;
@@ -489,7 +538,7 @@ textarea#nameInput{
     showScreen(state.round > 0 ? "screen-game" : "screen-title");
   });
   els.btnResetNames.addEventListener("click", function(){
-    els.nameInput.value = CATEGORIES[state.category].defaultWords.join("\n");
+    els.nameInput.value = defaultWordsFor(state.category).join("\n");
   });
 
   // ---------- title / navigation ----------
@@ -577,6 +626,28 @@ textarea#nameInput{
     startSpin();
   });
 
+  function randomLetter(){
+    return LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
+  }
+
+  // どのリールも「目で追えるくらい ゆっくり」動くように、文字が切り替わる
+  // 間隔をだんだん のばしながら 正解の文字に着地させる(実際のスロットの減速に近い動き)
+  function buildFlickerPlan(reelIndex, correctChar, isTricky, group){
+    var letters = [];
+    var delays = [];
+    var preRollCount = reelIndex * 3 + 3;
+    for(var k = 0; k < preRollCount; k++){
+      letters.push(randomLetter());
+      delays.push(170);
+    }
+    var decelDelays = [190, 240, 300, 380, 470];
+    for(var d = 0; d < decelDelays.length - 1; d++){
+      letters.push(isTricky ? group[Math.floor(Math.random() * group.length)] : randomLetter());
+      delays.push(decelDelays[d]);
+    }
+    return { letters: letters, delays: delays, finalDelay: decelDelays[decelDelays.length - 1] };
+  }
+
   function startSpin(){
     state.spinning = true;
     state.landedCount = 0;
@@ -587,33 +658,43 @@ textarea#nameInput{
 
     var reelEls = Array.prototype.slice.call(els.reels.children);
     var word = state.target;
-
-    reelEls.forEach(function(reel){
-      reel.classList.add("spinning");
-      reel.classList.remove("landed");
-      var letterEl = reel.querySelector(".letter");
-      var interval = setInterval(function(){
-        letterEl.textContent = LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
-      }, 55);
-      state.reelTimers.push(interval);
-      reel._spinInterval = interval;
-    });
+    var total = reelEls.length;
 
     reelEls.forEach(function(reel, i){
-      var stopAt = 700 + i * 480;
+      reel.classList.remove("landed");
+      reel.classList.add("spinning");
       var correctChar = word[i];
-      var group = (i === state.trickyIndex) ? findConfusableGroup(correctChar) : null;
-      var timeout = setTimeout(function(){
-        clearInterval(reel._spinInterval);
-        reel.classList.remove("spinning");
-        if(group){
-          runTrickyFinish(reel, group, correctChar, reelEls.length);
-        }else{
-          landReel(reel, correctChar, reelEls.length);
-        }
-      }, stopAt);
-      state.reelTimers.push(timeout);
+      var isTricky = (i === state.trickyIndex);
+      var group = isTricky ? findConfusableGroup(correctChar) : null;
+      if(isTricky){
+        reel.classList.add("tricky");
+        addHintBadge(reel);
+      }
+      var plan = buildFlickerPlan(i, correctChar, isTricky, group);
+      runFlickerSequence(reel, plan, correctChar, total);
     });
+  }
+
+  function runFlickerSequence(reel, plan, correctChar, total){
+    var letterEl = reel.querySelector(".letter");
+    var idx = 0;
+    function step(){
+      if(idx < plan.letters.length){
+        letterEl.textContent = plan.letters[idx];
+        reel.classList.remove("flip");
+        void reel.offsetWidth;
+        reel.classList.add("flip");
+        sndFlicker();
+        var d = plan.delays[idx];
+        idx++;
+        var t = setTimeout(step, d);
+        state.reelTimers.push(t);
+      }else{
+        var t2 = setTimeout(function(){ landReel(reel, correctChar, total); }, plan.finalDelay);
+        state.reelTimers.push(t2);
+      }
+    }
+    step();
   }
 
   function addHintBadge(reel){
@@ -630,7 +711,7 @@ textarea#nameInput{
   function landReel(reel, correctChar, total){
     var letterEl = reel.querySelector(".letter");
     letterEl.textContent = correctChar;
-    reel.classList.remove("tricky", "flip");
+    reel.classList.remove("tricky", "flip", "spinning");
     removeHintBadge(reel);
     reel.classList.add("landed");
     sndTick();
@@ -640,40 +721,9 @@ textarea#nameInput{
       var t = setTimeout(function(){
         state.spinning = false;
         revealChoices();
-      }, 420);
+      }, 500);
       state.reelTimers.push(t);
     }
-  }
-
-  // 「る/ろ」のような形の似た文字は、最後の瞬間までゆっくり交互に見せて
-  // 「最後までしっかり見て選ぶ」注意力を育てる演出にする
-  function runTrickyFinish(reel, group, correctChar, total){
-    reel.classList.add("tricky");
-    addHintBadge(reel);
-    var letterEl = reel.querySelector(".letter");
-    var steps = [];
-    for(var k = 0; k < 4; k++){
-      steps.push(group[Math.floor(Math.random() * group.length)]);
-    }
-    steps.push(correctChar);
-    var delays = [80, 130, 190, 270, 380];
-    var idx = 0;
-    function step(){
-      if(idx < steps.length){
-        letterEl.textContent = steps[idx];
-        reel.classList.remove("flip");
-        void reel.offsetWidth;
-        reel.classList.add("flip");
-        sndSuspense(idx);
-        var d = delays[Math.min(idx, delays.length - 1)];
-        idx++;
-        var t = setTimeout(step, d);
-        state.reelTimers.push(t);
-      }else{
-        landReel(reel, correctChar, total);
-      }
-    }
-    step();
   }
 
   function shuffle(arr){
@@ -685,18 +735,46 @@ textarea#nameInput{
     return a;
   }
 
+  function createChoiceCard(word){
+    var item = iconForWord(state.category, word);
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "choice-card";
+
+    var inner = document.createElement("div");
+    inner.className = "card-inner";
+
+    var front = document.createElement("div");
+    front.className = "card-face card-front";
+    if(item.swatch){
+      var sw = document.createElement("span");
+      sw.className = "color-swatch";
+      sw.style.background = item.swatch;
+      if(item.border) sw.style.boxShadow = "inset 0 0 0 3px " + item.border;
+      front.appendChild(sw);
+    }else{
+      front.textContent = item.icon;
+    }
+
+    var back = document.createElement("div");
+    back.className = "card-face card-back";
+    back.textContent = word;
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    btn.appendChild(inner);
+    btn.addEventListener("click", function(){ handleChoice(btn, word); });
+    return btn;
+  }
+
   function revealChoices(){
     var others = state.names.filter(function(n){ return n !== state.target; });
     var distractors = shuffle(others).slice(0, Math.min(3, others.length));
     var options = shuffle([state.target].concat(distractors));
 
     els.choices.innerHTML = "";
-    options.forEach(function(name){
-      var btn = document.createElement("button");
-      btn.className = "choice-btn";
-      btn.textContent = name;
-      btn.addEventListener("click", function(){ handleChoice(btn, name); });
-      els.choices.appendChild(btn);
+    options.forEach(function(word){
+      els.choices.appendChild(createChoiceCard(word));
     });
 
     els.promptRow.hidden = false;
@@ -707,9 +785,10 @@ textarea#nameInput{
     state.reelTimers.push(t);
   }
 
-  function handleChoice(btn, name){
+  function handleChoice(btn, word){
     if(state.answered) return;
-    if(name === state.target){
+    btn.classList.add("flipped");
+    if(word === state.target){
       state.answered = true;
       btn.classList.add("correct");
       state.score += 1;
@@ -723,12 +802,10 @@ textarea#nameInput{
       });
       els.btnNext.hidden = false;
     }else{
-      btn.classList.add("wrong");
-      btn.classList.add("faded");
+      btn.classList.add("wrong", "faded");
       sndWrong();
       els.feedback.className = "feedback ng";
-      els.feedback.textContent = pickOne(["おしい！もういちど かんがえてみよう","ちがうみたい、ほかの こたえは？","にゃんと！もう いっかい トライ！"]);
-      setTimeout(function(){ btn.classList.remove("wrong"); }, 400);
+      els.feedback.textContent = pickOne(["おしい！もういちど かんがえてみよう","ちがうみたい、ほかの カードは？","にゃんと！もう いっかい トライ！"]);
     }
   }
 
