@@ -60,6 +60,11 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outli
 .logo{font-weight:800;font-size:26px;text-align:center;margin:10px 0 16px;line-height:1.4}
 .logo .sub{display:block;font-size:16px;font-weight:700;color:var(--pink-dark);margin-top:2px}
 
+.cat-picker{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:0 0 16px}
+.cat-btn{flex:1 1 auto;min-width:84px;min-height:44px;padding:10px 10px;border-radius:14px;background:var(--panel);border:2px solid var(--line);font-weight:700;font-size:14px;box-shadow:0 3px 0 rgba(74,56,38,.1)}
+.cat-btn:active{transform:translateY(2px);box-shadow:none}
+.cat-btn.active{background:var(--teal);border-color:var(--teal-dark);color:#fff}
+
 .panel{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:0 4px 0 rgba(74,56,38,.08)}
 .howto h2{margin:0 0 8px;font-size:17px}
 .howto ol{margin:0;padding-left:1.3em}
@@ -135,7 +140,9 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outli
 .lever-btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--yellow-dark)}
 .lever-btn[disabled]{opacity:.45;pointer-events:none}
 
-.prompt{text-align:center;font-weight:700;font-size:18px;margin:18px 0 10px;color:var(--purple-dark)}
+.prompt-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px 0 10px}
+.prompt{text-align:center;font-weight:700;font-size:18px;margin:0;color:var(--purple-dark)}
+.icon-btn.small{width:36px;height:36px;font-size:15px;flex:0 0 auto}
 .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .choice-btn{
   min-height:56px;background:var(--panel);border:3px solid var(--line);border-radius:16px;
@@ -185,18 +192,19 @@ textarea#nameInput{
   </header>
 
   <section id="screen-title" class="screen">
-    <h1 class="logo">🎰 だれの なまえ？<span class="sub">スロットあてっこゲーム</span></h1>
+    <h1 class="logo">🎰 スロットあてっこ<span class="sub">ゲーム</span></h1>
+    <div id="catPicker" class="cat-picker" role="group" aria-label="あそぶ カテゴリ"></div>
     <div class="panel howto">
       <h2>あそびかた</h2>
       <ol>
         <li>「レバーを ひく」で スロットが まわるよ</li>
         <li>もじが ひとつずつ とまっていくよ</li>
-        <li>とまった もじで、だれの なまえか かんがえよう</li>
+        <li>とまった もじで、なにか かんがえよう</li>
         <li>こたえだと おもう ボタンを タップ！</li>
       </ol>
     </div>
     <button id="btnStart" class="cta big">🎮 はじめる</button>
-    <button id="btnOpenSettingsFromTitle" class="link-btn">👦👧 あそぶ ひとの なまえを へんしゅうする</button>
+    <button id="btnOpenSettingsFromTitle" class="link-btn">📋 リストを へんしゅうする</button>
   </section>
 
   <section id="screen-game" class="screen" hidden>
@@ -215,7 +223,10 @@ textarea#nameInput{
       <button id="btnLever" class="lever-btn">🎰 レバーを ひく！</button>
     </div>
 
-    <p id="prompt" class="prompt" hidden>だれの なまえかな？</p>
+    <div id="promptRow" class="prompt-row" hidden>
+      <p id="prompt" class="prompt"></p>
+      <button id="btnHearWord" class="icon-btn small" aria-label="もういちど きく" title="もういちど きく">🔊</button>
+    </div>
     <div id="choices" class="choices" hidden></div>
     <p id="feedback" class="feedback" aria-live="polite"></p>
     <button id="btnNext" class="cta" hidden>▶ つぎの もんだい</button>
@@ -223,8 +234,8 @@ textarea#nameInput{
   </section>
 
   <section id="screen-settings" class="screen" hidden>
-    <h2>なまえリストの へんしゅう</h2>
-    <p class="hint">1ぎょうに ひとつずつ、ひらがな・カタカナで なまえを にゅうりょくしてね（さいてい 4にん ひつよう）。おともだちや かぞくの なまえに かえて あそべるよ。</p>
+    <h2><span id="settingsCatLabel">なまえ</span> リストの へんしゅう</h2>
+    <p class="hint">1ぎょうに ひとつずつ、ひらがなで ことばを にゅうりょくしてね（さいてい 4こ ひつよう）。じぶんの クラスや かぞくに あわせて じゆうに かえて あそべるよ。</p>
     <textarea id="nameInput" spellcheck="false"></textarea>
     <div class="row">
       <button id="btnSaveNames" class="cta">💾 ほぞんする</button>
@@ -241,9 +252,36 @@ textarea#nameInput{
 (function(){
   "use strict";
 
-  var STORAGE_KEY = "nameSlotGame.names.v1";
+  var LEGACY_STORAGE_KEY = "nameSlotGame.names.v1";
+  var WORDS_KEY_PREFIX = "nameSlotGame.words.v1.";
+  var CATEGORY_KEY = "nameSlotGame.category.v1";
   var MUTE_KEY = "nameSlotGame.muted.v1";
-  var DEFAULT_NAMES = ["れん","ゆい","そら","みお","はると","さくら","ひなた","あおい","ゆうと","いつき","めい","こはる","りく","あかり","たいが","のあ"];
+  var CATEGORIES = {
+    name: {
+      label: "なまえ",
+      chip: "👦👧 なまえ",
+      prompt: "だれの なまえかな？",
+      defaultWords: ["れん","ゆい","そら","みお","はると","さくら","ひなた","あおい","ゆうと","いつき","めい","こはる","りく","あかり","たいが","のあ"]
+    },
+    animal: {
+      label: "どうぶつ",
+      chip: "🐰 どうぶつ",
+      prompt: "なんの どうぶつかな？",
+      defaultWords: ["いぬ","ねこ","うさぎ","ぞう","きりん","ぱんだ","くま","らいおん","さる","とら","ひつじ","うま","ぶた","かえる","ぺんぎん","かば"]
+    },
+    fruit: {
+      label: "くだもの",
+      chip: "🍎 くだもの",
+      prompt: "なんの くだものかな？",
+      defaultWords: ["りんご","ばなな","みかん","いちご","ぶどう","もも","すいか","めろん","なし","かき","さくらんぼ","れもん","びわ","くり"]
+    },
+    color: {
+      label: "いろ",
+      chip: "🎨 いろ",
+      prompt: "なにいろ かな？",
+      defaultWords: ["あか","あお","きいろ","みどり","むらさき","ぴんく","くろ","しろ","ちゃいろ","みずいろ","きんいろ","ぎんいろ"]
+    }
+  };
   var LETTER_POOL = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ".split("");
   var CONFUSABLE_GROUPS = [
     ["る","ろ"],
@@ -267,14 +305,15 @@ textarea#nameInput{
   }
 
   var els = {};
-  ["btnSound","btnSettings","screen-title","btnStart","btnOpenSettingsFromTitle",
-   "screen-game","roundLabel","starGame","starTop","reels","trickyBanner","btnLever","prompt",
+  ["btnSound","btnSettings","screen-title","btnStart","btnOpenSettingsFromTitle","catPicker",
+   "screen-game","roundLabel","starGame","starTop","reels","trickyBanner","btnLever",
+   "promptRow","prompt","btnHearWord",
    "choices","feedback","btnNext","btnBackTitle",
-   "screen-settings","nameInput","btnSaveNames","btnResetNames","btnCloseSettings",
+   "screen-settings","settingsCatLabel","nameInput","btnSaveNames","btnResetNames","btnCloseSettings",
    "confettiLayer"].forEach(function(id){ els[id] = document.getElementById(id); });
 
   var state = {
-    names: loadNames(),
+    category: loadCategory(),
     muted: loadMuted(),
     score: 0,
     round: 0,
@@ -286,28 +325,68 @@ textarea#nameInput{
     landedCount: 0,
     trickyIndex: -1
   };
+  state.names = loadWords(state.category);
 
   updateSoundIcon();
   updateStars();
+  renderCategoryPicker();
 
-  function loadNames(){
+  function loadCategory(){
     try{
-      var raw = localStorage.getItem(STORAGE_KEY);
+      var c = localStorage.getItem(CATEGORY_KEY);
+      if(c && CATEGORIES[c]) return c;
+    }catch(e){}
+    return "name";
+  }
+  function saveCategory(c){
+    try{ localStorage.setItem(CATEGORY_KEY, c); }catch(e){}
+  }
+  function loadWords(category){
+    try{
+      var raw = localStorage.getItem(WORDS_KEY_PREFIX + category);
       if(raw){
         var arr = JSON.parse(raw);
         if(Array.isArray(arr) && arr.length >= 4) return arr;
       }
+      if(category === "name"){
+        var legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if(legacy){
+          var larr = JSON.parse(legacy);
+          if(Array.isArray(larr) && larr.length >= 4) return larr;
+        }
+      }
     }catch(e){}
-    return DEFAULT_NAMES.slice();
+    return CATEGORIES[category].defaultWords.slice();
   }
-  function saveNames(arr){
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }catch(e){}
+  function saveWords(category, arr){
+    try{ localStorage.setItem(WORDS_KEY_PREFIX + category, JSON.stringify(arr)); }catch(e){}
   }
   function loadMuted(){
     try{ return localStorage.getItem(MUTE_KEY) === "1"; }catch(e){ return false; }
   }
   function saveMuted(v){
     try{ localStorage.setItem(MUTE_KEY, v ? "1" : "0"); }catch(e){}
+  }
+
+  function renderCategoryPicker(){
+    els.catPicker.innerHTML = "";
+    Object.keys(CATEGORIES).forEach(function(key){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "cat-btn" + (key === state.category ? " active" : "");
+      btn.textContent = CATEGORIES[key].chip;
+      btn.addEventListener("click", function(){ selectCategory(key); });
+      els.catPicker.appendChild(btn);
+    });
+  }
+
+  function selectCategory(key){
+    if(key === state.category) return;
+    state.category = key;
+    saveCategory(key);
+    state.names = loadWords(key);
+    state.lastTarget = null;
+    renderCategoryPicker();
   }
 
   function showScreen(name){
@@ -352,6 +431,21 @@ textarea#nameInput{
   function sndWrong(){ beep(220,.18,0,"sawtooth",.12); beep(180,.22,.1,"sawtooth",.1); }
   function sndSuspense(step){ beep(300 + step * 35, .09, 0, "triangle", .1); }
 
+  function speak(text, rate, pitch){
+    if(state.muted) return;
+    if(!("speechSynthesis" in window)) return;
+    try{
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = "ja-JP";
+      u.rate = rate || 0.9;
+      u.pitch = pitch || 1.15;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  function stopSpeaking(){
+    try{ if("speechSynthesis" in window) window.speechSynthesis.cancel(); }catch(e){}
+  }
+
   function updateSoundIcon(){
     els.btnSound.textContent = state.muted ? "🔇" : "🔊";
   }
@@ -360,11 +454,20 @@ textarea#nameInput{
     state.muted = !state.muted;
     saveMuted(state.muted);
     updateSoundIcon();
-    if(!state.muted) ensureAudio();
+    if(state.muted){
+      stopSpeaking();
+    }else{
+      ensureAudio();
+    }
+  });
+
+  els.btnHearWord.addEventListener("click", function(){
+    if(state.target) speak(state.target, 0.9, 1.05);
   });
 
   // ---------- settings ----------
   function openSettings(){
+    els.settingsCatLabel.textContent = CATEGORIES[state.category].label;
     els.nameInput.value = state.names.join("\n");
     showScreen("screen-settings");
   }
@@ -378,16 +481,15 @@ textarea#nameInput{
     var uniq = [];
     lines.forEach(function(n){ if(uniq.indexOf(n) === -1) uniq.push(n); });
     if(uniq.length < 4){
-      els.feedback.textContent = "";
-      alert("なまえは 4にん いじょう にゅうりょくしてね！");
+      alert("ことばは 4こ いじょう にゅうりょくしてね！");
       return;
     }
     state.names = uniq;
-    saveNames(uniq);
+    saveWords(state.category, uniq);
     showScreen(state.round > 0 ? "screen-game" : "screen-title");
   });
   els.btnResetNames.addEventListener("click", function(){
-    els.nameInput.value = DEFAULT_NAMES.join("\n");
+    els.nameInput.value = CATEGORIES[state.category].defaultWords.join("\n");
   });
 
   // ---------- title / navigation ----------
@@ -401,6 +503,7 @@ textarea#nameInput{
   });
   els.btnBackTitle.addEventListener("click", function(){
     clearReelTimers();
+    stopSpeaking();
     showScreen("screen-title");
   });
 
@@ -443,11 +546,13 @@ textarea#nameInput{
 
   function nextRound(){
     clearReelTimers();
+    stopSpeaking();
     state.answered = false;
     state.spinning = false;
     state.round += 1;
     state.target = pickTarget();
     els.roundLabel.textContent = state.round + "もんめ";
+    els.prompt.textContent = CATEGORIES[state.category].prompt;
     buildReels(state.target);
     var trickyCandidates = [];
     state.target.split("").forEach(function(ch, idx){
@@ -457,7 +562,7 @@ textarea#nameInput{
       ? trickyCandidates[Math.floor(Math.random() * trickyCandidates.length)]
       : -1;
     els.trickyBanner.hidden = (state.trickyIndex === -1);
-    els.prompt.hidden = true;
+    els.promptRow.hidden = true;
     els.choices.hidden = true;
     els.choices.innerHTML = "";
     els.feedback.textContent = "";
@@ -477,6 +582,7 @@ textarea#nameInput{
     state.landedCount = 0;
     els.btnLever.setAttribute("disabled", "disabled");
     ensureAudio();
+    stopSpeaking();
     sndStart();
 
     var reelEls = Array.prototype.slice.call(els.reels.children);
@@ -528,6 +634,7 @@ textarea#nameInput{
     removeHintBadge(reel);
     reel.classList.add("landed");
     sndTick();
+    speak(correctChar, 0.85, 1.25);
     state.landedCount += 1;
     if(state.landedCount === total){
       var t = setTimeout(function(){
@@ -592,9 +699,12 @@ textarea#nameInput{
       els.choices.appendChild(btn);
     });
 
-    els.prompt.hidden = false;
+    els.promptRow.hidden = false;
     els.choices.hidden = false;
     els.btnLever.hidden = true;
+
+    var t = setTimeout(function(){ speak(state.target, 0.9, 1.05); }, 350);
+    state.reelTimers.push(t);
   }
 
   function handleChoice(btn, name){
