@@ -114,6 +114,16 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outli
 @keyframes jiggle{0%{transform:translateY(0)}50%{transform:translateY(2px)}100%{transform:translateY(0)}}
 .reel.landed{animation:pop .38s ease}
 @keyframes pop{0%{transform:scale(1.35) rotate(-6deg)}55%{transform:scale(.9) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+.reel.tricky{box-shadow:inset 0 0 0 3px var(--yellow-dark),0 0 12px 2px rgba(255,201,60,.65);perspective:200px}
+.reel .hint-badge{position:absolute;top:-12px;right:-8px;font-size:16px;animation:badgePulse .6s infinite;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+@keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.reel.flip .letter{animation:flipStep .16s ease}
+@keyframes flipStep{0%{transform:rotateX(80deg);opacity:.25}100%{transform:rotateX(0deg);opacity:1}}
+.tricky-banner{
+  text-align:center;font-weight:800;font-size:13.5px;color:var(--purple-dark);
+  background:#FDF3D8;border:2px dashed var(--yellow-dark);border-radius:14px;
+  padding:8px 10px;margin:0 0 10px;
+}
 
 .lever-wrap{display:flex;justify-content:center;margin-top:18px}
 .lever-btn{
@@ -195,6 +205,7 @@ textarea#nameInput{
       <span class="score">⭐ <span id="starGame">0</span></span>
     </div>
 
+    <p id="trickyBanner" class="tricky-banner" hidden>🔍 にている もじに ちゅうい！さいごまで よくみてね</p>
     <div class="machine">
       <div class="machine-lights" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
       <div id="reels" class="reels"></div>
@@ -234,10 +245,30 @@ textarea#nameInput{
   var MUTE_KEY = "nameSlotGame.muted.v1";
   var DEFAULT_NAMES = ["れん","ゆい","そら","みお","はると","さくら","ひなた","あおい","ゆうと","いつき","めい","こはる","りく","あかり","たいが","のあ"];
   var LETTER_POOL = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ".split("");
+  var CONFUSABLE_GROUPS = [
+    ["る","ろ"],
+    ["わ","ね","れ"],
+    ["ぬ","め"],
+    ["は","ほ"],
+    ["さ","ち"],
+    ["し","つ"],
+    ["い","り"],
+    ["く","へ"],
+    ["な","た"],
+    ["ま","も"],
+    ["ん","そ"],
+    ["お","あ"]
+  ];
+  function findConfusableGroup(ch){
+    for(var i = 0; i < CONFUSABLE_GROUPS.length; i++){
+      if(CONFUSABLE_GROUPS[i].indexOf(ch) !== -1) return CONFUSABLE_GROUPS[i];
+    }
+    return null;
+  }
 
   var els = {};
   ["btnSound","btnSettings","screen-title","btnStart","btnOpenSettingsFromTitle",
-   "screen-game","roundLabel","starGame","starTop","reels","btnLever","prompt",
+   "screen-game","roundLabel","starGame","starTop","reels","trickyBanner","btnLever","prompt",
    "choices","feedback","btnNext","btnBackTitle",
    "screen-settings","nameInput","btnSaveNames","btnResetNames","btnCloseSettings",
    "confettiLayer"].forEach(function(id){ els[id] = document.getElementById(id); });
@@ -251,7 +282,9 @@ textarea#nameInput{
     target: "",
     spinning: false,
     reelTimers: [],
-    answered: false
+    answered: false,
+    landedCount: 0,
+    trickyIndex: -1
   };
 
   updateSoundIcon();
@@ -317,6 +350,7 @@ textarea#nameInput{
   function sndTick(){ beep(880,.08,0,"square",.12); }
   function sndCorrect(){ beep(523,.14,0,"sine"); beep(659,.14,.12,"sine"); beep(784,.22,.24,"sine"); }
   function sndWrong(){ beep(220,.18,0,"sawtooth",.12); beep(180,.22,.1,"sawtooth",.1); }
+  function sndSuspense(step){ beep(300 + step * 35, .09, 0, "triangle", .1); }
 
   function updateSoundIcon(){
     els.btnSound.textContent = state.muted ? "🔇" : "🔊";
@@ -415,6 +449,14 @@ textarea#nameInput{
     state.target = pickTarget();
     els.roundLabel.textContent = state.round + "もんめ";
     buildReels(state.target);
+    var trickyCandidates = [];
+    state.target.split("").forEach(function(ch, idx){
+      if(findConfusableGroup(ch)) trickyCandidates.push(idx);
+    });
+    state.trickyIndex = trickyCandidates.length
+      ? trickyCandidates[Math.floor(Math.random() * trickyCandidates.length)]
+      : -1;
+    els.trickyBanner.hidden = (state.trickyIndex === -1);
     els.prompt.hidden = true;
     els.choices.hidden = true;
     els.choices.innerHTML = "";
@@ -432,6 +474,7 @@ textarea#nameInput{
 
   function startSpin(){
     state.spinning = true;
+    state.landedCount = 0;
     els.btnLever.setAttribute("disabled", "disabled");
     ensureAudio();
     sndStart();
@@ -452,22 +495,78 @@ textarea#nameInput{
 
     reelEls.forEach(function(reel, i){
       var stopAt = 700 + i * 480;
+      var correctChar = word[i];
+      var group = (i === state.trickyIndex) ? findConfusableGroup(correctChar) : null;
       var timeout = setTimeout(function(){
         clearInterval(reel._spinInterval);
         reel.classList.remove("spinning");
-        var letterEl = reel.querySelector(".letter");
-        letterEl.textContent = word[i];
-        reel.classList.add("landed");
-        sndTick();
-        if(i === reelEls.length - 1){
-          setTimeout(function(){
-            state.spinning = false;
-            revealChoices();
-          }, 420);
+        if(group){
+          runTrickyFinish(reel, group, correctChar, reelEls.length);
+        }else{
+          landReel(reel, correctChar, reelEls.length);
         }
       }, stopAt);
       state.reelTimers.push(timeout);
     });
+  }
+
+  function addHintBadge(reel){
+    var badge = document.createElement("span");
+    badge.className = "hint-badge";
+    badge.textContent = "🔍";
+    reel.appendChild(badge);
+  }
+  function removeHintBadge(reel){
+    var b = reel.querySelector(".hint-badge");
+    if(b) b.remove();
+  }
+
+  function landReel(reel, correctChar, total){
+    var letterEl = reel.querySelector(".letter");
+    letterEl.textContent = correctChar;
+    reel.classList.remove("tricky", "flip");
+    removeHintBadge(reel);
+    reel.classList.add("landed");
+    sndTick();
+    state.landedCount += 1;
+    if(state.landedCount === total){
+      var t = setTimeout(function(){
+        state.spinning = false;
+        revealChoices();
+      }, 420);
+      state.reelTimers.push(t);
+    }
+  }
+
+  // 「る/ろ」のような形の似た文字は、最後の瞬間までゆっくり交互に見せて
+  // 「最後までしっかり見て選ぶ」注意力を育てる演出にする
+  function runTrickyFinish(reel, group, correctChar, total){
+    reel.classList.add("tricky");
+    addHintBadge(reel);
+    var letterEl = reel.querySelector(".letter");
+    var steps = [];
+    for(var k = 0; k < 4; k++){
+      steps.push(group[Math.floor(Math.random() * group.length)]);
+    }
+    steps.push(correctChar);
+    var delays = [80, 130, 190, 270, 380];
+    var idx = 0;
+    function step(){
+      if(idx < steps.length){
+        letterEl.textContent = steps[idx];
+        reel.classList.remove("flip");
+        void reel.offsetWidth;
+        reel.classList.add("flip");
+        sndSuspense(idx);
+        var d = delays[Math.min(idx, delays.length - 1)];
+        idx++;
+        var t = setTimeout(step, d);
+        state.reelTimers.push(t);
+      }else{
+        landReel(reel, correctChar, total);
+      }
+    }
+    step();
   }
 
   function shuffle(arr){
