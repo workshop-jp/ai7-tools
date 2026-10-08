@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>キャッチ画像 5:2</title>
+<style>
+  :root{ --ink:#1F2A44; --coral:#FF6B4A; --teal:#1FA89A; --sun:#FFC94A; --line:#E9D9B8; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1500px;height:600px;overflow:hidden;font-family:'IPAGothic','IPAPGothic','Noto Sans CJK JP',sans-serif;color:var(--ink)}
+  #c{position:relative;width:1500px;height:600px;overflow:hidden;
+    background:radial-gradient(circle at 8% 10%, #FFE7B8 0, rgba(255,231,184,0) 42%),
+      linear-gradient(100deg,#FFF4E0 0,#FFF4E0 55%,#EAF6F2 78%,#D6F1EC 100%)}
+  .dots{position:absolute;inset:0;background-image:radial-gradient(var(--line) 3px,transparent 3px);background-size:50px 50px;opacity:.5}
+  .badge{position:absolute;left:72px;top:58px;background:var(--coral);color:#fff;font-size:38px;padding:8px 30px;border-radius:999px;border:5px solid var(--ink);box-shadow:0 6px 0 var(--ink);letter-spacing:.08em}
+  .kicker{position:absolute;left:290px;top:66px;font-size:34px;color:#55607A}
+  h1{position:absolute;left:72px;top:140px;font-size:74px;line-height:1.24;-webkit-text-stroke:2.5px var(--ink);font-weight:normal;white-space:nowrap}
+  mark{background:linear-gradient(transparent 60%,#FFD36B 60%);color:inherit;padding:0 6px}
+  mark.c{background:linear-gradient(transparent 60%,#FFB7A5 60%)}
+  .sub{position:absolute;left:72px;top:452px;font-size:40px;line-height:1.5;-webkit-text-stroke:1px var(--ink)}
+  .sub span{display:inline-block;background:var(--ink);color:#fff;-webkit-text-stroke:0;padding:4px 22px;border-radius:12px;margin-right:12px;font-size:34px}
+  .pill{position:absolute;left:664px;top:464px;background:var(--teal);color:#fff;font-size:28px;padding:2px 22px;border-radius:999px;border:4px solid var(--ink)}
+  svg.art{position:absolute;right:0;top:0;width:560px;height:600px;overflow:visible}
+  .ground{position:absolute;left:0;right:0;top:548px;height:52px;background:#CDE7C4;border-top:6px solid var(--ink)}
+</style>
+</head>
+<body>
+<div id="c">
+  <div class="dots"></div>
+  <div class="badge">保存版</div>
+  <div class="kicker">X運用で伸び悩むあなたへ</div>
+  <h1>伸びないのは、<br><mark class="c">荷物が足りない</mark><br>からじゃない。</h1>
+  <div class="sub"><span>足す前に</span>下ろしたい<mark>5つの荷物</mark></div>
+  <div class="pill">心理学の研究つき</div>
+
+  <div class="ground"></div>
+  <svg class="art" viewBox="0 0 560 600">
+    <!-- far hill -->
+    <path d="M-20 548 L120 440 L250 548 Z" fill="#BFE3DA" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"/>
+    <!-- mountain -->
+    <polygon points="40,548 330,150 560,430 560,548" fill="#8FC7B8" stroke="#1F2A44" stroke-width="7" stroke-linejoin="round"/>
+    <polygon points="330,150 282,212 322,236 356,206 390,240 428,208" fill="#fff" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"/>
+    <!-- trail -->
+    <polyline points="290,540 440,490 330,430 450,370 350,312 420,260 340,222" fill="none" stroke="#FFF4E0" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 20"/>
+    <!-- flag -->
+    <rect x="326" y="76" width="6" height="80" fill="#1F2A44"/>
+    <path d="M332 76 L392 94 L332 114 Z" fill="#FF6B4A" stroke="#1F2A44" stroke-width="4" stroke-linejoin="round"/>
+    <!-- ground -->
+
+    <!-- B (light pack) at summit -->
+    <g transform="translate(298,134) scale(.34)">
+      <rect x="30" y="92" width="34" height="56" rx="12" fill="#FFC94A" stroke="#1F2A44" stroke-width="7"/>
+      <line x1="66" y1="170" x2="66" y2="238" stroke="#1F2A44" stroke-width="18" stroke-linecap="round"/>
+      <line x1="96" y1="170" x2="96" y2="238" stroke="#1F2A44" stroke-width="18" stroke-linecap="round"/>
+      <rect x="48" y="78" width="66" height="96" rx="24" fill="#1FA89A" stroke="#1F2A44" stroke-width="7"/>
+      <circle cx="82" cy="44" r="36" fill="#FFD9B3" stroke="#1F2A44" stroke-width="7"/>
+      <path d="M44 38 Q82 -4 120 38 Z" fill="#FF6B4A"/>
+      <path d="M62 52 Q70 44 78 52M88 52 Q96 44 104 52" stroke="#1F2A44" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M70 64 Q83 82 96 64 Z" fill="#fff" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"/>
+    </g>
+
+    <!-- A (big pack) at trailhead -->
+    <g transform="translate(36,326) scale(.82)">
+      <ellipse cx="34" cy="125" rx="62" ry="86" fill="#FFC94A" stroke="#1F2A44" stroke-width="7"/>
+      <path d="M-4 96 Q30 82 66 96" stroke="#1F2A44" stroke-width="6" fill="none"/>
+      <line x1="66" y1="170" x2="66" y2="238" stroke="#1F2A44" stroke-width="16" stroke-linecap="round"/><rect x="46" y="234" width="40" height="16" rx="8" fill="#1F2A44"/>
+      <line x1="96" y1="170" x2="96" y2="238" stroke="#1F2A44" stroke-width="16" stroke-linecap="round"/><rect x="76" y="234" width="40" height="16" rx="8" fill="#1F2A44"/>
+      <rect x="48" y="78" width="66" height="96" rx="24" fill="#FF6B4A" stroke="#1F2A44" stroke-width="7"/>
+      <circle cx="82" cy="44" r="36" fill="#FFD9B3" stroke="#1F2A44" stroke-width="7"/>
+      <path d="M44 38 Q82 -4 120 38 Z" fill="#1F2A44"/>
+      <circle cx="70" cy="54" r="5" fill="#1F2A44"/><circle cx="96" cy="54" r="5" fill="#1F2A44"/>
+      <path d="M60 47 L78 40M106 47 L88 40" stroke="#1F2A44" stroke-width="4" stroke-linecap="round"/>
+      <path d="M72 74 Q83 64 94 74" stroke="#1F2A44" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M122 24 q8 14 0 22 q-8 -8 0 -22z" fill="#8FD3F4" stroke="#1F2A44" stroke-width="3"/>
+    </g>
+    <!-- floating worry chips -->
+    <g font-family="IPAGothic" font-size="22" fill="#1F2A44">
+      <g transform="translate(20,296) rotate(-8)"><rect width="208" height="40" rx="20" fill="#FFE0D6" stroke="#1F2A44" stroke-width="4"/><text x="104" y="28" text-anchor="middle">もしも、炎上したら</text></g>
+      <g transform="translate(196,236) rotate(5)"><rect width="196" height="40" rx="20" fill="#FFF0B8" stroke="#1F2A44" stroke-width="4"/><text x="98" y="28" text-anchor="middle">もう1冊、ノウハウ</text></g>
+    </g>
+  </svg>
+</div>
+</body>
+</html>
