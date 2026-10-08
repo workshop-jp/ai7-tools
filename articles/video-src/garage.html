@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>整備ばかりで、まだ1メートルも走っていない</title>
+<style>
+  :root{ --bg:#FFF4E0; --ink:#1F2A44; --coral:#FF6B4A; --teal:#1FA89A; --sun:#FFC94A; --line:#E9D9B8; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg);
+    font-family:'IPAGothic','IPAPGothic','Noto Sans CJK JP','Hiragino Sans',sans-serif;color:var(--ink)}
+  #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:
+    radial-gradient(circle at 12% 10%, #FFE7B8 0, rgba(255,231,184,0) 42%),
+    radial-gradient(circle at 92% 70%, #D6F1EC 0, rgba(214,241,236,0) 45%), var(--bg)}
+  .dots{position:absolute;inset:0;background-image:radial-gradient(var(--line) 3px,transparent 3px);background-size:60px 60px;opacity:.55}
+
+  #board{position:absolute;left:90px;right:90px;top:90px;height:230px;border-radius:40px;background:#fff;
+    border:6px solid var(--ink);box-shadow:0 14px 0 var(--ink);display:flex;opacity:0;transform:translateY(-80px)}
+  .cell{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+  .cell+.cell{border-left:6px dashed var(--line)}
+  .lbl{font-size:36px;letter-spacing:.04em}
+  .num{font-size:104px;line-height:1;-webkit-text-stroke:3px var(--ink);font-variant-numeric:tabular-nums}
+  .num small{font-size:44px;-webkit-text-stroke:1.5px var(--ink);margin-left:8px}
+  #saved{color:var(--teal);-webkit-text-stroke:3px var(--teal)}
+  #km{color:var(--coral);-webkit-text-stroke:3px var(--coral)}
+
+  #cap{position:absolute;left:60px;right:60px;top:380px;height:470px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity .45s}
+  #cap .main{font-size:80px;line-height:1.38;-webkit-text-stroke:2px var(--ink);white-space:pre-line}
+  #cap .sub{margin-top:22px;font-size:34px;line-height:1.55;color:#55607A;white-space:pre-line}
+  mark{background:linear-gradient(transparent 58%,#FFD36B 58%);color:inherit;padding:0 6px}
+  mark.c{background:linear-gradient(transparent 58%,#FFB7A5 58%)}
+
+  /* world (garage + road) */
+  #road{position:absolute;left:0;right:0;top:1640px;height:200px;background:#39425A;border-top:8px solid var(--ink)}
+  #dash{position:absolute;left:0;top:1730px;width:2400px;height:14px;
+    background:repeating-linear-gradient(90deg,#FFF4E0 0 90px,transparent 90px 180px);opacity:.9}
+  #garage{position:absolute;left:30px;top:1090px;width:620px;height:560px;will-change:transform}
+  #car{position:absolute;left:0;top:1435px;width:460px;height:220px;z-index:3;will-change:transform}
+  .wheel{transform-box:fill-box;transform-origin:center}
+  #car.run .wheel{animation:spin .45s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #sweat{opacity:0;transition:opacity .3s}
+  #car.worry #sweat{opacity:1}
+  #car.happy #smile{opacity:1}
+  #smile{opacity:0}
+
+  .tool{position:absolute;z-index:4;width:90px;height:90px;opacity:0}
+  .spark{position:absolute;z-index:4;width:48px;height:48px;opacity:0}
+
+  #end{position:absolute;inset:0;z-index:6;background:rgba(255,244,224,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;opacity:0;transition:opacity .6s;text-align:center}
+  #end .big{font-size:96px;line-height:1.36;-webkit-text-stroke:2.5px var(--ink)}
+  #end .small{font-size:46px;color:#55607A}
+  #end .tag{margin-top:30px;font-size:52px;background:var(--ink);color:#fff;padding:18px 44px;border-radius:999px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="dots"></div>
+
+  <div id="board">
+    <div class="cell"><div class="lbl">集めたノウハウ</div><div class="num" id="saved">0</div></div>
+    <div class="cell"><div class="lbl">走行距離</div><div class="num"><span id="km">0.0</span><small>km</small></div></div>
+  </div>
+
+  <div id="cap"><div class="main" id="capMain"></div><div class="sub" id="capSub"></div></div>
+
+  <svg id="garage" viewBox="0 0 620 560">
+    <polygon points="0,210 310,20 620,210" fill="#E8735A" stroke="#1F2A44" stroke-width="8" stroke-linejoin="round"/>
+    <rect x="30" y="210" width="560" height="350" fill="#FBE0B0" stroke="#1F2A44" stroke-width="8"/>
+    <rect x="70" y="250" width="480" height="310" fill="#2B3350" stroke="#1F2A44" stroke-width="8"/>
+    <!-- rolled-up door -->
+    <rect x="70" y="250" width="480" height="46" fill="#C9D3E6" stroke="#1F2A44" stroke-width="6"/>
+    <g stroke="#1F2A44" stroke-width="4" opacity=".5"><path d="M70 266H550"/><path d="M70 282H550"/></g>
+    <circle cx="310" cy="140" r="34" fill="#fff" stroke="#1F2A44" stroke-width="6"/>
+    <path d="M310 118 V142 L326 152" stroke="#1F2A44" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </svg>
+
+  <div id="road"></div><div id="dash"></div>
+
+  <svg id="car" class="" viewBox="0 0 460 220">
+    <path d="M20 150 Q20 120 52 112 L112 100 Q142 50 202 48 L300 48 Q352 52 377 100 L422 112 Q446 118 446 150 L446 168 L20 168 Z" fill="#1FA89A" stroke="#1F2A44" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M136 100 Q156 66 202 64 L240 64 L240 100 Z" fill="#CDEFF0" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M254 64 L298 64 Q330 68 348 100 L254 100 Z" fill="#CDEFF0" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="428" cy="136" r="11" fill="#FFC94A" stroke="#1F2A44" stroke-width="4"/>
+    <rect x="22" y="132" width="14" height="22" rx="5" fill="#FF6B4A" stroke="#1F2A44" stroke-width="3"/>
+    <!-- eyes in window -->
+    <circle cx="196" cy="84" r="7" fill="#1F2A44"/><circle cx="292" cy="84" r="7" fill="#1F2A44"/>
+    <path id="smile" d="M214 112 Q244 134 274 112" stroke="#1F2A44" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path id="sweat" d="M338 28 q14 24 0 36 q-14 -12 0 -36z" fill="#8FD3F4" stroke="#1F2A44" stroke-width="4"/>
+    <g class="wheel"><circle cx="112" cy="170" r="42" fill="#1F2A44"/><circle cx="112" cy="170" r="21" fill="#DDE3EE"/>
+      <path d="M112 150V190M92 170H132" stroke="#1F2A44" stroke-width="5"/></g>
+    <g class="wheel"><circle cx="352" cy="170" r="42" fill="#1F2A44"/><circle cx="352" cy="170" r="21" fill="#DDE3EE"/>
+      <path d="M352 150V190M332 170H372" stroke="#1F2A44" stroke-width="5"/></g>
+  </svg>
+
+  <!-- wrenches / sparkles -->
+  <svg class="tool" id="t1" viewBox="0 0 90 90"><g fill="#C9D3E6" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"><path d="M20 70 L52 38 A18 18 0 1 1 64 26 L58 34 L66 42 L74 36 A18 18 0 0 1 48 56 L28 78 Z"/></g></svg>
+  <svg class="tool" id="t2" viewBox="0 0 90 90"><g fill="#FFC94A" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"><circle cx="45" cy="45" r="22"/><circle cx="45" cy="45" r="8" fill="#fff"/><path d="M45 12V22M45 68V78M12 45H22M68 45H78"/></g></svg>
+  <svg class="tool" id="t3" viewBox="0 0 90 90"><g fill="#FF6B4A" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"><rect x="26" y="18" width="38" height="56" rx="8"/><rect x="36" y="10" width="18" height="12" rx="3" fill="#fff"/></g></svg>
+  <svg class="spark" id="s1" viewBox="0 0 48 48"><path d="M24 2 L29 19 L46 24 L29 29 L24 46 L19 29 L2 24 L19 19 Z" fill="#FFC94A" stroke="#1F2A44" stroke-width="3" stroke-linejoin="round"/></svg>
+  <svg class="spark" id="s2" viewBox="0 0 48 48"><path d="M24 2 L29 19 L46 24 L29 29 L24 46 L19 29 L2 24 L19 19 Z" fill="#fff" stroke="#1F2A44" stroke-width="3" stroke-linejoin="round"/></svg>
+
+  <div id="end">
+    <div class="small">今日の、最初の1周</div>
+    <div class="big">もし〇〇したら、<br>△△を<mark>1つ</mark>やる。</div>
+    <div class="big"><mark class="c">今から15分。</mark></div>
+    <div class="tag">@ai_7days_lab</div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const ease = {in:t=>t*t, out:t=>1-(1-t)*(1-t), io:t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2};
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function tween(ms, fn){
+  return new Promise(res => {
+    const t0 = performance.now();
+    (function f(now){
+      const t = Math.min(1, (now - t0) / ms);
+      fn(t);
+      t < 1 ? requestAnimationFrame(f) : res();
+    })(t0);
+  });
+}
+const CAR_Y = 1435, CAR_HOME = 140;
+let carX = CAR_HOME;
+function placeCar(x, dy=0, rot=0){ carX = x; $('#car').style.transform = `translate(${x}px,${dy}px) rotate(${rot}deg)`; }
+const garage = $('#garage');
+function placeGarage(dx){ garage.style.transform = `translateX(${dx}px)`; }
+
+/* maintenance fuss: tools and sparkles orbit the car */
+let fuss = false;
+async function fussLoop(){
+  fuss = true;
+  const items = [['#t1',-60,-90],['#t2',470,-70],['#t3',420,150]];
+  const sparks = [['#s1',70,-30],['#s2',380,-40]];
+  items.forEach(([id]) => $(id).style.opacity = 1);
+  const t0 = performance.now();
+  while(fuss){
+    const now = performance.now() - t0;
+    items.forEach(([id,ox,oy], i) => {
+      const el = $(id);
+      const bob = Math.sin(now/260 + i*2) * 18;
+      el.style.left = (carX + ox) + 'px';
+      el.style.top = (CAR_Y + oy + bob) + 'px';
+      el.style.transform = `rotate(${Math.sin(now/200 + i)*28}deg)`;
+    });
+    sparks.forEach(([id,ox,oy], i) => {
+      const el = $(id);
+      const k = (Math.sin(now/180 + i*1.7) + 1) / 2;
+      el.style.opacity = k > .55 ? 1 : 0;
+      el.style.left = (carX + ox) + 'px'; el.style.top = (CAR_Y + oy) + 'px';
+      el.style.transform = `scale(${.6 + k*.7}) rotate(${now/8}deg)`;
+    });
+    await new Promise(r => requestAnimationFrame(r));
+  }
+  [...items, ...sparks].forEach(([id]) => $(id).style.opacity = 0);
+}
+
+async function setCap(main, sub='', hold=0){
+  const cap = $('#cap'); cap.style.opacity = 0; await sleep(450);
+  $('#capMain').innerHTML = main; $('#capSub').innerHTML = sub; cap.style.opacity = 1;
+  if(hold) await sleep(hold);
+}
+async function countUp(el, to, ms, dec=0){
+  await tween(ms, t => { el.textContent = (to * ease.out(t)).toFixed(dec); });
+}
+function bump(el){ el.animate([{transform:'scale(1)'},{transform:'scale(1.4)'},{transform:'scale(1)'}], {duration:520, easing:'ease-out'}); }
+
+/* the car in the garage: tiny nervous jiggle while "being maintained" */
+let jig = true;
+async function jiggle(){
+  const t0 = performance.now();
+  while(jig){
+    const t = performance.now() - t0;
+    placeCar(CAR_HOME, Math.sin(t/120) * 4, Math.sin(t/190) * .6);
+    await new Promise(r => requestAnimationFrame(r));
+  }
+  placeCar(CAR_HOME);
+}
+
+/* drive out of the garage, then roll along the road */
+let rolling = false, dashX = 0;
+async function driveOut(){
+  $('#car').classList.add('run');
+  await tween(2300, t => placeCar(CAR_HOME + (560 - CAR_HOME) * ease.io(t)));
+  rolling = true;
+  (async () => { let last = performance.now();
+    while(rolling){ const now = performance.now(); dashX -= (now - last) * .55; last = now;
+      $('#dash').style.transform = `translateX(${dashX % 180}px)`;
+      await new Promise(r => requestAnimationFrame(r)); } })();
+  await tween(3200, t => placeGarage(-900 * ease.io(t)));
+}
+
+async function main(){
+  placeCar(CAR_HOME); placeGarage(0);
+  jiggle(); fussLoop();
+
+  // 0s
+  await setCap('整備ばかりで、<br>まだ<mark>1メートル</mark>も<br>走っていない。', '', 4500);
+
+  // 5s counters
+  $('#board').animate([{opacity:0,transform:'translateY(-80px)'},{opacity:1,transform:'translateY(0)'}], {duration:600, easing:'ease-out', fill:'forwards'});
+  const c2 = setCap('ピカピカになった。<br>でも、走行距離は<mark class="c">0km。</mark>', '');
+  await Promise.all([c2, countUp($('#saved'), 128, 5200)]);
+  await sleep(900);
+
+  // 12s worry
+  $('#car').classList.add('worry');
+  await setCap('「まだ整備が、<br>足りない気がする」', '', 3800);
+
+  // 16s research
+  await setCap('「それっぽい作業」で<br>先延ばしする人ほど、<br><mark class="c">成績が悪い</mark>傾向。',
+    '勉強の代わりに、別の作業をする人（大学生1,106人の調査・Westgate ほか 2016）\n※ 副業への当てはめは、私の解釈です', 6500);
+
+  // 23s drive out
+  $('#car').classList.remove('worry');
+  jig = false; fuss = false;
+  const cDrive = setCap('まず、家の前を<mark>1周</mark>。<br>それだけで、いい。', '最初のドライブ＝1行の投稿', 0);
+  await sleep(900);
+  $('#car').classList.add('happy');
+  const kmP = countUp($('#km'), 0.3, 2400, 1);
+  await driveOut();
+  bump($('#km'));
+  await cDrive; await kmP;
+  await sleep(500);
+
+  // 31s run on
+  const km2 = countUp($('#km'), 3.2, 4200, 1);
+  await setCap('走ってはじめて、<br><mark>道が見える。</mark>', '整備は、走りながらでいい。<br>最初の10回は、試運転のつもりで。', 4800);
+  await km2;
+
+  // 38s end card
+  rolling = false; $('#car').classList.remove('run');
+  $('#end').style.opacity = 1;
+  await sleep(4300);
+  window.__done = true;
+}
+window.addEventListener('load', () => setTimeout(main, 400));
+</script>
+</body>
+</html>
