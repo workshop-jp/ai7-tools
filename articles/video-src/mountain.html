@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>ザックがパンパンで、まだ登山口</title>
+<style>
+  :root{ --bg:#FFF4E0; --ink:#1F2A44; --coral:#FF6B4A; --teal:#1FA89A; --sun:#FFC94A; --line:#E9D9B8; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg);
+    font-family:'IPAGothic','IPAPGothic','Noto Sans CJK JP','Hiragino Sans',sans-serif;color:var(--ink)}
+  #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:
+    radial-gradient(circle at 15% 8%, #FFE7B8 0, rgba(255,231,184,0) 42%),
+    linear-gradient(#FFF4E0 0, #EAF6F2 60%, #D6F1EC 100%)}
+  .dots{position:absolute;inset:0;background-image:radial-gradient(var(--line) 3px,transparent 3px);background-size:60px 60px;opacity:.5}
+
+  #board{position:absolute;left:90px;right:90px;top:90px;height:230px;border-radius:40px;background:#fff;
+    border:6px solid var(--ink);box-shadow:0 14px 0 var(--ink);display:flex;opacity:0;transform:translateY(-80px);z-index:8}
+  .cell{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+  .cell+.cell{border-left:6px dashed var(--line)}
+  .lbl{font-size:36px;letter-spacing:.04em}
+  .num{font-size:104px;line-height:1;-webkit-text-stroke:3px var(--ink);font-variant-numeric:tabular-nums}
+  .num small{font-size:44px;-webkit-text-stroke:1.5px var(--ink);margin-left:8px}
+  #items{color:var(--coral);-webkit-text-stroke:3px var(--coral)}
+  #alt{color:var(--teal);-webkit-text-stroke:3px var(--teal)}
+
+  #cap{position:absolute;left:60px;right:60px;top:380px;height:470px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity .45s;z-index:7}
+  #cap .main{font-size:78px;line-height:1.38;-webkit-text-stroke:2px var(--ink);white-space:pre-line}
+  #cap .sub{margin-top:22px;font-size:33px;line-height:1.55;color:#55607A;white-space:pre-line}
+  mark{background:linear-gradient(transparent 58%,#FFD36B 58%);color:inherit;padding:0 6px}
+  mark.c{background:linear-gradient(transparent 58%,#FFB7A5 58%)}
+
+  #world{position:absolute;left:0;top:0;width:1080px;height:1920px}
+  #ground{position:absolute;left:0;right:0;top:1640px;height:280px;background:#CDE7C4;border-top:8px solid var(--ink);z-index:1}
+
+  .person{position:absolute;width:160px;height:260px;overflow:visible;z-index:3}
+  .leg{transform-box:fill-box;transform-origin:50% 0}
+  .person.walk .l1{animation:swing .5s ease-in-out infinite alternate}
+  .person.walk .l2{animation:swing .5s ease-in-out infinite alternate-reverse}
+  @keyframes swing{from{transform:rotate(24deg)}to{transform:rotate(-24deg)}}
+  .person .w,.person .h,.person .sweat{opacity:0}
+  .person.worry .w{opacity:1}.person.worry .n{opacity:0}.person.worry .sweat{opacity:1}
+  .person.happy .h{opacity:1}.person.happy .n{opacity:0}
+  #packA{transform-box:fill-box;transform-origin:70% 60%}
+
+  .chip{position:absolute;z-index:5;padding:12px 26px;border-radius:999px;font-size:40px;white-space:nowrap;background:#fff;border:5px solid var(--ink);box-shadow:0 6px 0 var(--ink)}
+  .chip.k{background:#FFE0D6}.chip.t{background:#D9F2EE}.chip.y{background:#FFF0B8}
+  #foot{position:absolute;left:0;right:0;top:1850px;text-align:center;font-size:28px;color:#55607A;z-index:7}
+
+  #end{position:absolute;inset:0;z-index:9;background:rgba(255,244,224,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;opacity:0;transition:opacity .6s;text-align:center}
+  #end .big{font-size:92px;line-height:1.36;-webkit-text-stroke:2.5px var(--ink)}
+  #end .small{font-size:46px;color:#55607A}
+  #end .tag{margin-top:30px;font-size:52px;background:var(--ink);color:#fff;padding:18px 44px;border-radius:999px}
+  .conf{position:absolute;width:22px;height:34px;z-index:6;border-radius:4px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="dots"></div>
+
+  <div id="board">
+    <div class="cell"><div class="lbl">ザックの中身</div><div class="num"><span id="items">0</span><small>個</small></div></div>
+    <div class="cell"><div class="lbl">標高</div><div class="num"><span id="alt">0</span><small>m</small></div></div>
+  </div>
+
+  <div id="cap"><div class="main" id="capMain"></div><div class="sub" id="capSub"></div></div>
+
+  <svg id="world" viewBox="0 0 1080 1920">
+    <!-- far hill -->
+    <path d="M-40 1640 L260 1380 L520 1640 Z" fill="#BFE3DA" stroke="#1F2A44" stroke-width="6" stroke-linejoin="round"/>
+    <!-- mountain -->
+    <polygon points="100,1640 700,980 1080,1500 1080,1640" fill="#8FC7B8" stroke="#1F2A44" stroke-width="8" stroke-linejoin="round"/>
+    <polygon points="700,980 640,1046 690,1074 730,1040 770,1084 820,1046" fill="#fff" stroke="#1F2A44" stroke-width="6" stroke-linejoin="round"/>
+    <!-- trail -->
+    <polyline id="trail" points="560,1625 800,1540 620,1430 810,1330 650,1230 780,1130 700,1040" fill="none" stroke="#FFF4E0" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 28"/>
+    <!-- sign -->
+    <g><rect x="596" y="1560" width="12" height="80" fill="#1F2A44"/><rect x="540" y="1530" width="124" height="48" rx="8" fill="#FFC94A" stroke="#1F2A44" stroke-width="5"/>
+      <text x="602" y="1565" font-size="26" text-anchor="middle" fill="#1F2A44" font-family="IPAGothic">登山口</text></g>
+    <!-- flag -->
+    <g id="flag"><rect x="694" y="900" width="8" height="106" fill="#1F2A44"/><path d="M702 900 L780 922 L702 946 Z" fill="#FF6B4A" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"/></g>
+  </svg>
+
+  <div id="ground"></div>
+
+  <!-- A : big pack -->
+  <svg class="person worry" id="A" viewBox="0 0 160 260" style="left:210px;top:1385px">
+    <ellipse id="packA" cx="30" cy="125" rx="40" ry="56" fill="#FFC94A" stroke="#1F2A44" stroke-width="6"/>
+    <path d="M10 100 Q30 90 52 100" stroke="#1F2A44" stroke-width="5" fill="none"/>
+    <g class="leg l1"><line x1="66" y1="170" x2="66" y2="238" stroke="#1F2A44" stroke-width="16" stroke-linecap="round"/><rect x="46" y="234" width="40" height="16" rx="8" fill="#1F2A44"/></g>
+    <g class="leg l2"><line x1="96" y1="170" x2="96" y2="238" stroke="#1F2A44" stroke-width="16" stroke-linecap="round"/><rect x="76" y="234" width="40" height="16" rx="8" fill="#1F2A44"/></g>
+    <rect x="48" y="78" width="66" height="96" rx="24" fill="#FF6B4A" stroke="#1F2A44" stroke-width="6"/>
+    <circle cx="82" cy="44" r="36" fill="#FFD9B3" stroke="#1F2A44" stroke-width="6"/>
+    <path d="M44 38 Q82 -4 120 38 Z" fill="#1F2A44"/>
+    <g class="n"><circle cx="70" cy="52" r="5" fill="#1F2A44"/><circle cx="96" cy="52" r="5" fill="#1F2A44"/><path d="M72 68 Q83 76 94 68" stroke="#1F2A44" stroke-width="5" fill="none" stroke-linecap="round"/></g>
+    <g class="w"><circle cx="70" cy="54" r="5" fill="#1F2A44"/><circle cx="96" cy="54" r="5" fill="#1F2A44"/><path d="M60 47 L78 40M106 47 L88 40" stroke="#1F2A44" stroke-width="4" stroke-linecap="round"/><path d="M72 74 Q83 64 94 74" stroke="#1F2A44" stroke-width="5" fill="none" stroke-linecap="round"/></g>
+    <g class="h"><path d="M62 52 Q70 44 78 52M88 52 Q96 44 104 52" stroke="#1F2A44" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M70 64 Q83 82 96 64 Z" fill="#fff" stroke="#1F2A44" stroke-width="4" stroke-linejoin="round"/></g>
+    <path class="sweat" d="M122 24 q8 14 0 22 q-8 -8 0 -22z" fill="#8FD3F4" stroke="#1F2A44" stroke-width="3"/>
+  </svg>
+
+  <!-- B : light pack -->
+  <svg class="person" id="B" viewBox="0 0 160 260" style="left:500px;top:1385px">
+    <rect x="30" y="92" width="34" height="56" rx="12" fill="#FFC94A" stroke="#1F2A44" stroke-width="5"/>
+    <g class="leg l1"><line x1="66" y1="170" x2="66" y2="238" stroke="#1F2A44" stroke-width="16" stroke-linecap="round"/><rect x="46" y="234" width="40" height="16" rx="8" fill="#1F2A44"/></g>
+    <g class="leg l2"><line x1="96" y1="170" x2="96" y2="238" stroke="#1F2A44" stroke-width="16" stroke-linecap="round"/><rect x="76" y="234" width="40" height="16" rx="8" fill="#1F2A44"/></g>
+    <rect x="48" y="78" width="66" height="96" rx="24" fill="#1FA89A" stroke="#1F2A44" stroke-width="6"/>
+    <circle cx="82" cy="44" r="36" fill="#FFD9B3" stroke="#1F2A44" stroke-width="6"/>
+    <path d="M44 38 Q82 -4 120 38 Z" fill="#FF6B4A"/>
+    <g class="n"><circle cx="70" cy="52" r="5" fill="#1F2A44"/><circle cx="96" cy="52" r="5" fill="#1F2A44"/><path d="M72 66 Q83 78 94 66" stroke="#1F2A44" stroke-width="5" fill="none" stroke-linecap="round"/></g>
+    <g class="h"><path d="M62 52 Q70 44 78 52M88 52 Q96 44 104 52" stroke="#1F2A44" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M70 64 Q83 82 96 64 Z" fill="#fff" stroke="#1F2A44" stroke-width="4" stroke-linejoin="round"/></g>
+  </svg>
+
+  <div id="foot">※ 数字は、イメージです</div>
+
+  <div id="end">
+    <div class="small">最低限そろえて、今日の一歩</div>
+    <div class="big">もし〇〇したら、<br>△△を<mark>1つ</mark>やる。</div>
+    <div class="big"><mark class="c">今から15分。</mark></div>
+    <div class="tag">@ai_7days_lab</div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const ease = {in:t=>t*t, out:t=>1-(1-t)*(1-t), io:t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2};
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function tween(ms, fn){
+  return new Promise(res => {
+    const t0 = performance.now();
+    (function f(now){
+      const t = Math.min(1, (now - t0) / ms);
+      fn(t);
+      t < 1 ? requestAnimationFrame(f) : res();
+    })(t0);
+  });
+}
+async function setCap(main, sub='', hold=0){
+  const cap = $('#cap'); cap.style.opacity = 0; await sleep(450);
+  $('#capMain').innerHTML = main; $('#capSub').innerHTML = sub; cap.style.opacity = 1;
+  if(hold) await sleep(hold);
+}
+
+/* path for B */
+const PTS = [[560,1625],[800,1540],[620,1430],[810,1330],[650,1230],[780,1130],[700,1040]];
+const segLen = PTS.slice(1).map((p,i)=>Math.hypot(p[0]-PTS[i][0], p[1]-PTS[i][1]));
+const total = segLen.reduce((a,b)=>a+b,0);
+function pathAt(u){
+  let d = u * total;
+  for(let i=0;i<segLen.length;i++){
+    if(d <= segLen[i]){ const k = d / segLen[i]; return [PTS[i][0] + (PTS[i+1][0]-PTS[i][0])*k, PTS[i][1] + (PTS[i+1][1]-PTS[i][1])*k]; }
+    d -= segLen[i];
+  }
+  return PTS[PTS.length-1];
+}
+let bu = 0;
+function placeB(u){
+  bu = u;
+  const [x,y] = pathAt(u);
+  const s = 1 - 0.45 * u;               // gets smaller as it climbs
+  const B = $('#B');
+  B.style.left = (x - 80) + 'px'; B.style.top = (y - 250 * s - 6) + 'px';
+  B.style.transform = `scale(${s})`; B.style.transformOrigin = '50% 100%';
+  $('#alt').textContent = Math.round(1500 * u / 10) * 10;
+}
+async function climbTo(u1, ms){
+  const u0 = bu; $('#B').classList.add('walk');
+  await tween(ms, t => placeB(u0 + (u1 - u0) * t));
+  $('#B').classList.remove('walk');
+}
+
+/* A's pack and chips */
+let packScale = 1, nItems = 0;
+function setPack(s){ packScale = s; $('#packA').style.transform = `scale(${s})`; }
+const CHIPS = [['もう1冊、ノウハウ','y'],['もしも、笑われたら','k'],['最新ツール','t'],['念のため、もう1本保存','y'],['もしも、失敗したら','k'],['もしも、炎上したら','k']];
+function flyChip(txt, cls, delay){
+  const el = document.createElement('div'); el.className = 'chip ' + cls; el.textContent = txt;
+  const x0 = 220 + Math.random()*320, y0 = 860 + Math.random()*120;
+  el.style.left = x0 + 'px'; el.style.top = y0 + 'px';
+  $('#stage').appendChild(el);
+  const a = el.animate([
+    {transform:'translate(0,0) scale(1)', opacity:0},
+    {transform:'translate(0,0) scale(1)', opacity:1, offset:.18},
+    {transform:`translate(${290 - x0 - 120}px, ${1500 - y0}px) scale(.35)`, opacity:1, offset:.92},
+    {transform:`translate(${290 - x0 - 120}px, ${1520 - y0}px) scale(.1)`, opacity:0}
+  ], {duration: 1500, delay, easing:'ease-in', fill:'forwards'});
+  a.onfinish = () => el.remove();
+}
+function dropChip(txt, cls, dx){
+  const el = document.createElement('div'); el.className = 'chip ' + cls; el.textContent = txt;
+  el.style.left = '200px'; el.style.top = '1440px'; $('#stage').appendChild(el);
+  const a = el.animate([
+    {transform:'translate(0,0) rotate(0)', opacity:1},
+    {transform:`translate(${dx}px,-260px) rotate(${dx/10}deg)`, opacity:1, offset:.4},
+    {transform:`translate(${dx*1.4}px,180px) rotate(${dx/5}deg)`, opacity:0}
+  ], {duration: 1400, easing:'ease-out', fill:'forwards'});
+  a.onfinish = () => el.remove();
+}
+async function packItems(){
+  for(let i = 0; i < CHIPS.length; i++){
+    flyChip(CHIPS[i][0], CHIPS[i][1], 0);
+    await sleep(1100);
+    nItems = Math.round(47 * (i + 1) / CHIPS.length);
+    $('#items').textContent = nItems;
+    setPack(1 + 0.22 * (i + 1));
+    $('#items').animate([{transform:'scale(1)'},{transform:'scale(1.3)'},{transform:'scale(1)'}], {duration:360});
+  }
+}
+
+function confetti(){
+  const colors = ['#FF6B4A','#FFC94A','#1FA89A','#1F2A44','#8FD3F4'];
+  for(let i=0;i<46;i++){
+    const d = document.createElement('div'); d.className='conf';
+    d.style.background = colors[i % colors.length];
+    d.style.left = '690px'; d.style.top = '900px';
+    $('#stage').appendChild(d);
+    const dx = (Math.random() - .5) * 900, dy = -250 - Math.random() * 450, r = Math.random() * 720;
+    d.animate([
+      {transform:'translate(0,0) rotate(0)', opacity:1},
+      {transform:`translate(${dx*.6}px,${dy}px) rotate(${r*.6}deg)`, opacity:1, offset:.4},
+      {transform:`translate(${dx}px,${dy + 900}px) rotate(${r}deg)`, opacity:0}
+    ], {duration: 1900 + Math.random()*700, easing:'cubic-bezier(.2,.6,.4,1)', fill:'forwards'});
+  }
+}
+
+async function main(){
+  placeB(0); setPack(1);
+  window.__done = false;
+
+  // 0s
+  await setCap('ザックがパンパンで、<br>まだ<mark class="c">登山口。</mark>', '', 4300);
+
+  // 5s : packing
+  $('#board').animate([{opacity:0,transform:'translateY(-80px)'},{opacity:1,transform:'translateY(0)'}], {duration:600, easing:'ease-out', fill:'forwards'});
+  const capP = setCap('あれも、これも。<br>念のため、持っていく。', '', 0);
+  const packP = packItems();
+  await sleep(3200);
+  climbTo(0.28, 6500);                 // B quietly starts walking
+  await Promise.all([capP, packP]);
+  await sleep(700);
+
+  // 12s : worry research
+  await setCap('まだ起きていない雨の<br>ために、<mark class="c">歩き出せない。</mark>',
+    '心配ごとの約9割は、現実にならなかった\n（不安症の人29人を30日追跡・米ペンシルベニア州立大 2020）\n※ 小さな調査で、確認できた心配だけが対象です', 0);
+  await climbTo(0.55, 6500);
+
+  // 19s : minimum gear
+  await setCap('「最低限」は、<br>ちゃんと決まっている。',
+    '登山には「必携品」の決まりがある\n（地図・水・ライト・救急セット…）\n足さなくていいのは、「もしかしたら」の荷物', 0);
+  await climbTo(0.92, 6500);
+
+  // 27s : summit
+  await climbTo(1, 1500);
+  $('#B').classList.add('happy'); confetti();
+  await setCap('歩き出した人は、<br>とっくに<mark>頂上</mark>にいた。', '', 4500);
+
+  // 33s : A drops items and starts
+  $('#A').classList.remove('worry');
+  const capP2 = setCap('荷物を下ろせば、<br>歩き出せる。', '天気は、歩きながら見ればいい。\n変わったら、引き返してもいい。', 0);
+  dropChip('もしも、炎上したら','k',-120); await sleep(500);
+  dropChip('念のため、もう1本保存','y',160); await sleep(500);
+  dropChip('もう1冊、ノウハウ','t',-60);
+  await tween(1800, t => { setPack(packScale - (packScale - 1.0) * ease.io(t) * .85); const n = Math.round(nItems - (nItems - 5) * t); $('#items').textContent = n; });
+  $('#A').classList.add('happy');
+  const A = $('#A'); A.classList.add('walk');
+  await tween(3800, t => { A.style.left = (210 + 300 * ease.io(t)) + 'px'; });
+  A.classList.remove('walk');
+  await capP2;
+  await sleep(600);
+
+  // 41s : end
+  $('#end').style.opacity = 1;
+  await sleep(4300);
+  window.__done = true;
+}
+window.addEventListener('load', () => setTimeout(main, 400));
+</script>
+</body>
+</html>
