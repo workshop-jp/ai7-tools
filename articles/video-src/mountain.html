@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1080, initial-scale=1">
-<title>ザックがパンパンで、まだ登山口</title>
+<title>リュックがパンパンで、まだ登山口</title>
 <style>
   :root{ --bg:#FFF4E0; --ink:#1F2A44; --coral:#FF6B4A; --teal:#1FA89A; --sun:#FFC94A; --line:#E9D9B8; }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -59,7 +59,7 @@
   <div class="dots"></div>
 
   <div id="board">
-    <div class="cell"><div class="lbl">ザックの中身</div><div class="num"><span id="items">0</span><small>個</small></div></div>
+    <div class="cell"><div class="lbl">リュックの中身</div><div class="num"><span id="items">0</span><small>個</small></div></div>
     <div class="cell"><div class="lbl">標高</div><div class="num"><span id="alt">0</span><small>m</small></div></div>
   </div>
 
@@ -226,7 +226,7 @@ async function main(){
   window.__done = false;
 
   // 0s
-  await setCap('ザックがパンパンで、<br>まだ<mark class="c">登山口。</mark>', '', 4300);
+  await setCap('リュックがパンパンで、<br>まだ<mark class="c">登山口。</mark>', '', 4300);
 
   // 5s : packing
   $('#board').animate([{opacity:0,transform:'translateY(-80px)'},{opacity:1,transform:'translateY(0)'}], {duration:600, easing:'ease-out', fill:'forwards'});
