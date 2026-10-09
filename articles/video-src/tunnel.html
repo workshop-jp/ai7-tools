@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>あと一歩でやめる人、続けて金脈にたどりつく人</title>
+<style>
+  :root{ --bg:#FFF4E0; --ink:#1F2A44; --coral:#FF6B4A; --teal:#1FA89A; --sun:#FFC94A; --line:#E9D9B8; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg);
+    font-family:'IPAGothic','IPAPGothic','Noto Sans CJK JP','Hiragino Sans',sans-serif;color:var(--ink)}
+  #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:
+    radial-gradient(circle at 12% 8%, #FFE7B8 0, rgba(255,231,184,0) 42%),
+    linear-gradient(#FFF4E0 0, #FBEBD0 100%)}
+  .dots{position:absolute;inset:0;background-image:radial-gradient(var(--line) 3px,transparent 3px);background-size:60px 60px;opacity:.5}
+
+  #board{position:absolute;left:90px;right:90px;top:90px;height:230px;border-radius:40px;background:#fff;
+    border:6px solid var(--ink);box-shadow:0 14px 0 var(--ink);display:flex;opacity:0;transform:translateY(-80px);z-index:8}
+  .cell{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+  .cell+.cell{border-left:6px dashed var(--line)}
+  .lbl{font-size:34px;letter-spacing:.04em}
+  .num{font-size:100px;line-height:1;-webkit-text-stroke:3px var(--ink);font-variant-numeric:tabular-nums}
+  .num small{font-size:42px;-webkit-text-stroke:1.5px var(--ink);margin-left:8px}
+  #dA{color:var(--coral);-webkit-text-stroke:3px var(--coral)}
+  #dB{color:var(--teal);-webkit-text-stroke:3px var(--teal)}
+
+  #cap{position:absolute;left:60px;right:60px;top:370px;height:460px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity .45s;z-index:7}
+  #cap .main{font-size:78px;line-height:1.38;-webkit-text-stroke:2px var(--ink);white-space:pre-line}
+  #cap .sub{margin-top:20px;font-size:32px;line-height:1.55;color:#55607A;white-space:pre-line}
+  mark{background:linear-gradient(transparent 58%,#FFD36B 58%);color:inherit;padding:0 6px}
+  mark.c{background:linear-gradient(transparent 58%,#FFB7A5 58%)}
+
+  /* two shafts side by side (cross-section view) */
+  #scene{position:absolute;left:0;top:0;width:1080px;height:1920px;transition:opacity .8s}
+  .col{position:absolute;top:850px;width:440px;height:900px}
+  .name{position:absolute;left:0;right:0;top:-70px;text-align:center;font-size:46px;-webkit-text-stroke:1.5px var(--ink)}
+  .box{position:absolute;inset:0;border:6px solid var(--ink);border-radius:30px;overflow:hidden;
+    background:linear-gradient(#8FD18F 0 40px,#D9B98A 40px 300px,#C79F6B 300px 560px,#B58757 560px 740px,#8C6A45 740px 100%)}
+  .rocks{position:absolute;inset:0;opacity:.35;background-image:radial-gradient(#8C6A45 6px,transparent 7px);background-size:70px 64px}
+  .shaft{position:absolute;left:165px;top:40px;width:110px;height:0;background:#2B3350;border-left:5px solid var(--ink);border-right:5px solid var(--ink)}
+  .gold{position:absolute;left:100px;top:742px;width:240px;height:130px;opacity:0}
+  .miner{position:absolute;left:170px;width:100px;height:170px;overflow:visible;z-index:3}
+  .pick{transform-box:fill-box;transform-origin:10% 90%}
+  .miner .w,.miner .h,.miner .sd,.miner .sweat{opacity:0}
+  .miner.worry .w{opacity:1}.miner.worry .n{opacity:0}.miner.worry .sweat{opacity:1}
+  .miner.happy .h{opacity:1}.miner.happy .n{opacity:0}
+  .miner.sad .sd{opacity:1}.miner.sad .n{opacity:0}
+  .bubble{position:absolute;z-index:5;padding:10px 24px;border-radius:999px;background:#fff;border:5px solid var(--ink);box-shadow:0 6px 0 var(--ink);font-size:38px;white-space:nowrap;opacity:0}
+  .tag{position:absolute;z-index:5;padding:8px 22px;border-radius:14px;background:var(--ink);color:#fff;font-size:34px;white-space:nowrap;opacity:0}
+  .conf{position:absolute;width:20px;height:30px;z-index:6;border-radius:4px}
+
+  #note{position:absolute;left:110px;right:110px;top:860px;height:760px;background:#fff;border:6px solid var(--ink);border-radius:28px;box-shadow:0 14px 0 var(--ink);padding:44px 50px;opacity:0;z-index:6}
+  #note h3{font-size:56px;font-weight:normal;-webkit-text-stroke:2px var(--ink);margin-bottom:22px}
+  #note .row{font-size:44px;line-height:1.5;border-bottom:4px dashed var(--line);padding:14px 0;opacity:0}
+  #note .row b{color:var(--teal);font-weight:normal;-webkit-text-stroke:1px var(--teal)}
+  #foot{position:absolute;left:0;right:0;top:1850px;text-align:center;font-size:28px;color:#55607A;z-index:7}
+
+  #end{position:absolute;inset:0;z-index:9;background:rgba(255,244,224,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;opacity:0;transition:opacity .6s;text-align:center;padding:0 60px}
+  #end .big{font-size:88px;line-height:1.38;-webkit-text-stroke:2.5px var(--ink)}
+  #end .small{font-size:46px;color:#55607A}
+  #end .tg{margin-top:30px;font-size:52px;background:var(--ink);color:#fff;padding:18px 44px;border-radius:999px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="dots"></div>
+
+  <div id="board">
+    <div class="cell"><div class="lbl">Aさんの掘った深さ</div><div class="num"><span id="dA">0</span><small>m</small></div></div>
+    <div class="cell"><div class="lbl">Bさんの掘った深さ</div><div class="num"><span id="dB">0</span><small>m</small></div></div>
+  </div>
+
+  <div id="cap"><div class="main" id="capMain"></div><div class="sub" id="capSub"></div></div>
+
+  <div id="scene">
+    <!-- A -->
+    <div class="col" id="colA" style="left:70px">
+      <div class="name" style="color:#FF6B4A">Aさん</div>
+      <div class="box"><div class="rocks"></div><div class="shaft" id="shA"></div>
+        <svg class="gold" id="goldA" viewBox="0 0 240 130"><g stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"><polygon points="20,120 60,50 110,80 130,20 180,70 220,120" fill="#FFC94A"/><polygon points="60,120 100,76 140,120" fill="#FFE27A"/></g><path d="M126 34 L134 30 M150 58 L158 52" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>
+      </div>
+      <svg class="miner worry" id="mA" viewBox="0 0 100 170">
+        <g class="pick" id="pkA"><line x1="82" y1="96" x2="108" y2="56" stroke="#8C6A45" stroke-width="9" stroke-linecap="round"/><path d="M96 46 Q112 42 124 56" stroke="#1F2A44" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+        <rect x="34" y="104" width="12" height="52" rx="6" fill="#1F2A44"/><rect x="54" y="104" width="12" height="52" rx="6" fill="#1F2A44"/>
+        <rect x="26" y="66" width="48" height="60" rx="16" fill="#FF6B4A" stroke="#1F2A44" stroke-width="5"/>
+        <circle cx="50" cy="42" r="26" fill="#FFD9B3" stroke="#1F2A44" stroke-width="5"/>
+        <path d="M22 38 Q50 -2 78 38 Z" fill="#FFC94A" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"/><circle cx="50" cy="14" r="7" fill="#fff" stroke="#1F2A44" stroke-width="3"/>
+        <g class="n"><circle cx="41" cy="46" r="4" fill="#1F2A44"/><circle cx="59" cy="46" r="4" fill="#1F2A44"/><path d="M42 58 Q50 64 58 58" stroke="#1F2A44" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+        <g class="w"><circle cx="41" cy="48" r="4" fill="#1F2A44"/><circle cx="59" cy="48" r="4" fill="#1F2A44"/><path d="M33 38 L46 43 M67 38 L54 43" stroke="#1F2A44" stroke-width="3.5" stroke-linecap="round"/><path d="M42 62 Q50 55 58 62" stroke="#1F2A44" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+        <g class="sd"><path d="M35 46 Q41 52 47 46 M53 46 Q59 52 65 46" stroke="#1F2A44" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M42 64 Q50 56 58 64" stroke="#1F2A44" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+        <path class="sweat" d="M72 26 q6 10 0 16 q-6 -6 0 -16z" fill="#8FD3F4" stroke="#1F2A44" stroke-width="2.5"/>
+      </svg>
+      <div class="bubble" id="bbA" style="left:150px;top:-210px">もう無理だ…</div>
+      <div class="tag" id="tgA" style="left:120px;top:690px">あと一歩…だったかも？</div>
+    </div>
+
+    <!-- B -->
+    <div class="col" id="colB" style="left:570px">
+      <div class="name" style="color:#1FA89A">Bさん</div>
+      <div class="box"><div class="rocks"></div><div class="shaft" id="shB"></div>
+        <svg class="gold" id="goldB" viewBox="0 0 240 130"><g stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"><polygon points="20,120 60,50 110,80 130,20 180,70 220,120" fill="#FFC94A"/><polygon points="60,120 100,76 140,120" fill="#FFE27A"/></g><path d="M126 34 L134 30 M150 58 L158 52" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>
+      </div>
+      <svg class="miner worry" id="mB" viewBox="0 0 100 170">
+        <g class="pick" id="pkB"><line x1="82" y1="96" x2="108" y2="56" stroke="#8C6A45" stroke-width="9" stroke-linecap="round"/><path d="M96 46 Q112 42 124 56" stroke="#1F2A44" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+        <rect x="34" y="104" width="12" height="52" rx="6" fill="#1F2A44"/><rect x="54" y="104" width="12" height="52" rx="6" fill="#1F2A44"/>
+        <rect x="26" y="66" width="48" height="60" rx="16" fill="#1FA89A" stroke="#1F2A44" stroke-width="5"/>
+        <circle cx="50" cy="42" r="26" fill="#FFD9B3" stroke="#1F2A44" stroke-width="5"/>
+        <path d="M22 38 Q50 -2 78 38 Z" fill="#FFC94A" stroke="#1F2A44" stroke-width="5" stroke-linejoin="round"/><circle cx="50" cy="14" r="7" fill="#fff" stroke="#1F2A44" stroke-width="3"/>
+        <g class="n"><circle cx="41" cy="46" r="4" fill="#1F2A44"/><circle cx="59" cy="46" r="4" fill="#1F2A44"/><path d="M42 58 Q50 64 58 58" stroke="#1F2A44" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+        <g class="w"><circle cx="41" cy="48" r="4" fill="#1F2A44"/><circle cx="59" cy="48" r="4" fill="#1F2A44"/><path d="M33 38 L46 43 M67 38 L54 43" stroke="#1F2A44" stroke-width="3.5" stroke-linecap="round"/><path d="M42 62 Q50 55 58 62" stroke="#1F2A44" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+        <g class="h"><path d="M33 46 Q41 38 49 46 M51 46 Q59 38 67 46" stroke="#1F2A44" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M40 56 Q50 72 60 56 Z" fill="#fff" stroke="#1F2A44" stroke-width="3.5" stroke-linejoin="round"/></g>
+        <path class="sweat" d="M72 26 q6 10 0 16 q-6 -6 0 -16z" fill="#8FD3F4" stroke="#1F2A44" stroke-width="2.5"/>
+      </svg>
+    </div>
+  </div>
+
+  <div id="note">
+    <h3>前進ノート</h3>
+    <div class="row" id="r1">今日の前進：<b>1行、投稿を出した</b></div>
+    <div class="row" id="r2">今日の前進：<b>ミュートを1つした</b></div>
+    <div class="row" id="r3">今日の前進：<b>書き出しを1つ変えた</b></div>
+    <div class="row" id="r4" style="border-bottom:none">1週間後、読み返して決める。</div>
+  </div>
+
+  <div id="foot">※ たとえ話です。数字は、イメージです</div>
+
+  <div id="end">
+    <div class="small">やめるのも、続けるのも、自由。</div>
+    <div class="big">ただし、決めるのは、<br><mark>疲れた夜</mark>ではなく、<br><mark class="c">記録を見た朝</mark>に。</div>
+    <div class="tg">@ai_7days_lab</div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const ease = {in:t=>t*t, out:t=>1-(1-t)*(1-t), io:t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2};
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function tween(ms, fn){
+  return new Promise(res => {
+    const t0 = performance.now();
+    (function f(now){
+      const t = Math.min(1, (now - t0) / ms);
+      fn(t);
+      t < 1 ? requestAnimationFrame(f) : res();
+    })(t0);
+  });
+}
+async function setCap(main, sub='', hold=0){
+  const cap = $('#cap'); cap.style.opacity = 0; await sleep(450);
+  $('#capMain').innerHTML = main; $('#capSub').innerHTML = sub; cap.style.opacity = 1;
+  if(hold) await sleep(hold);
+}
+
+/* state */
+const S = { A:{h:0, dig:false, top:null}, B:{h:0, dig:false, top:null} };
+const SHAFT_TOP = 40, MINER_H = 150;
+function setH(id, h){
+  S[id].h = h;
+  $('#sh'+id).style.height = h + 'px';
+  if(S[id].top === null){ $('#m'+id).style.top = (SHAFT_TOP + h - MINER_H + 6) + 'px'; }
+  $('#d'+id).textContent = Math.round(h * 0.2);
+}
+function setMinerTop(id, y){ S[id].top = y; $('#m'+id).style.top = y + 'px'; }
+function face(id, cls){ $('#m'+id).setAttribute('class', 'miner ' + cls); }
+
+/* pickaxe swing loop */
+(async function swing(){
+  const t0 = performance.now();
+  while(true){
+    const t = performance.now() - t0;
+    for(const id of ['A','B']){
+      const el = $('#pk'+id);
+      el.style.transform = S[id].dig ? `rotate(${-50 + 70 * Math.abs(Math.sin(t/170))}deg)` : 'rotate(20deg)';
+    }
+    await new Promise(r => requestAnimationFrame(r));
+  }
+})();
+
+async function digTo(id, h1, ms){
+  const h0 = S[id].h; S[id].dig = true;
+  await tween(ms, t => setH(id, h0 + (h1 - h0) * t));
+  S[id].dig = false;
+}
+
+function confetti(colId, x, y){
+  const colors = ['#FF6B4A','#FFC94A','#1FA89A','#1F2A44','#fff'];
+  for(let i=0;i<40;i++){
+    const d = document.createElement('div'); d.className='conf';
+    d.style.background = colors[i % colors.length];
+    d.style.left = x + 'px'; d.style.top = y + 'px';
+    $(colId).appendChild(d);
+    const dx = (Math.random() - .5) * 700, dy = -250 - Math.random() * 450, r = Math.random() * 720;
+    d.animate([
+      {transform:'translate(0,0) rotate(0)', opacity:1},
+      {transform:`translate(${dx*.6}px,${dy}px) rotate(${r*.6}deg)`, opacity:1, offset:.4},
+      {transform:`translate(${dx}px,${dy + 800}px) rotate(${r}deg)`, opacity:0}
+    ], {duration: 1800 + Math.random()*700, easing:'cubic-bezier(.2,.6,.4,1)', fill:'forwards'});
+  }
+}
+
+async function main(){
+  setH('A', 0); setH('B', 0);
+  window.__done = false;
+  // miners start at top inside the first bit of shaft: show them just under the grass
+  setH('A', 60); setH('B', 60);
+
+  // 0s : title
+  await sleep(300);
+  $('#board').animate([{opacity:0,transform:'translateY(-80px)'},{opacity:1,transform:'translateY(0)'}], {duration:600, easing:'ease-out', fill:'forwards'});
+  const cp = setCap('トンネルを掘る、<br>2人がいました。', '', 0);
+  const dA = digTo('A', 280, 4600), dB = digTo('B', 280, 4600);
+  await Promise.all([cp, dA, dB]);
+  await sleep(200);
+
+  // 5s : nothing comes out
+  const c2 = setCap('掘っても、掘っても、<br>何も<mark class="c">出てこない</mark>。', '（反応が少ない日々、のたとえ）', 0);
+  const a2 = digTo('A', 640, 6500), b2 = digTo('B', 640, 6500);
+  await sleep(2200); face('A','worry'); face('B','worry');
+  await Promise.all([c2, a2, b2]);
+
+  // 12.5s : A quits
+  face('A','sad');
+  const bb = $('#bbA'); bb.animate([{opacity:0,transform:'scale(.6)'},{opacity:1,transform:'scale(1)'}], {duration:400, fill:'forwards'});
+  const c3 = setCap('Aさんは、<br>ここで<mark class="c">やめました</mark>。', '「もう無理だ」', 0);
+  await sleep(900);
+  S.A.dig = false;
+  await tween(2400, t => setMinerTop('A', (SHAFT_TOP + 640 - MINER_H + 6) + ((-135) - (SHAFT_TOP + 640 - MINER_H + 6)) * ease.io(t)));
+  await c3;
+  await sleep(1000);
+
+  // 17s : B keeps digging
+  const c4 = setCap('Bさんは、<br><mark>もう少しだけ</mark>、<br>掘り続けました。', '', 0);
+  const b3 = digTo('B', 720, 5600);
+  await c4; await b3;
+
+  // 24s : gold!
+  face('B','happy');
+  $('#goldB').animate([{opacity:0,transform:'scale(.6)'},{opacity:1,transform:'scale(1.15)'},{opacity:1,transform:'scale(1)'}], {duration:700, fill:'forwards'});
+  confetti('#colB', 220, 700);
+  await setCap('…カキーン！<br><mark>金脈</mark>でした。', '', 3800);
+
+  // 29s : reveal A (maybe)
+  $('#goldA').animate([{opacity:0},{opacity:.5}], {duration:800, fill:'forwards'});
+  $('#tgA').animate([{opacity:0},{opacity:1}], {duration:600, delay:500, fill:'forwards'});
+  await setCap('Aさんの足もとにも、<br>あったのかもしれない。', '', 4200);
+
+  // 33s : honesty
+  await setCap('でも、「あと少し」かどうかは、<br>掘る前には<mark class="c">分かりません</mark>。',
+    '「あと一歩でやめた人」の話は、\n結果を知っている人が語る話です。\n（続ければ必ず金脈がある、という意味ではありません）', 7200);
+
+  // 41s : record instead of feeling
+  $('#scene').style.opacity = 0.1;
+  $('#note').animate([{opacity:0},{opacity:1}], {duration:600, fill:'forwards'});
+  await setCap('感覚ではなく、<br><mark>記録</mark>で決める。', '', 0);
+  for(const id of ['#r1','#r2','#r3','#r4']){
+    $(id).animate([{opacity:0,transform:'translateX(-30px)'},{opacity:1,transform:'translateX(0)'}], {duration:500, fill:'forwards'});
+    await sleep(1000);
+  }
+  await sleep(1200);
+
+  // end card
+  $('#end').style.opacity = 1;
+  await sleep(4800);
+  window.__done = true;
+}
+window.addEventListener('load', () => setTimeout(main, 400));
+</script>
+</body>
+</html>
