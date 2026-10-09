@@ -243,6 +243,7 @@ async function main(){
 
   // 24s : gold
   face('B','happy');
+  $('#bbA').animate([{opacity:1},{opacity:0}], {duration:600, fill:'forwards'});
   $('#goldB').animate([{opacity:0,transform:'scale(.7)'},{opacity:1,transform:'scale(1.12)'},{opacity:1,transform:'scale(1)'}], {duration:700, fill:'forwards'});
   confetti('#colB', 220, 640);
   await setCap('…カキーン！<br><mark>金脈</mark>でした。', '', 3800);
@@ -253,7 +254,7 @@ async function main(){
   await setCap('Aさんの足もとにも、<br>あったのかもしれない。', '', 4200);
 
   // 33s : honesty
-  await setCap('でも、「あと少し」かどうかは、<br>掘る前には<mark class="c">分かりません</mark>。',
+  await setCap('でも、「あと少し」かは、<br>掘る前には<mark class="c">分かりません</mark>。',
     '「あと一歩でやめた人」の話は、\n結果を知っている人が語る話です。\n（続ければ必ず金脈がある、という意味ではありません）', 7200);
 
   // 41s : records
