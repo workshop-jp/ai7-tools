@@ -1,0 +1,11 @@
+const HAZARD_LABELS={flood:'洪水',landslide:'土砂災害',stormSurge:'高潮',earthquake:'地震',tsunami:'津波',fire:'大規模火災',inlandFlood:'内水氾濫',volcano:'火山現象'};
+const TYPE_LABELS={emergency:'指定緊急避難場所',shelter:'指定避難所',welfareShelter:'福祉避難所',baby:'赤ちゃん・ふらっと'};
+const OFFICIAL={baby:'https://www.fukushi.metro.tokyo.lg.jp/kodomo/kosodate/akachanflat',gsi:'https://www.gsi.go.jp/bousaichiri/hinanbasho.html',gsiTerms:'https://www.gsi.go.jp/bousaichiri/hinanbasho-menseki.html',stats:'https://www.digital.go.jp/resources/japandashboard/economy-fiscal-living-municipality',hazard:'https://disaportal.gsi.go.jp/'};
+function normalized(s){return String(s||'').normalize('NFKC').toLowerCase().replace(/\s/g,'').replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));}
+function filterPlaces(rows,options){const q=normalized(options.query);return rows.filter(r=>(!options.city||(options.tab==='outing'?r.city===options.city:r.code===options.city))&&(!q||normalized([r.name,r.address,r.city].join(' ')).includes(q))&&(options.tab!=='outing'||((!options.knownHours||!!r.hours)&&(!options.publicOnly||isPublicOperator(r.operator))))&&(options.tab!=='prepare'||r.type===options.type&&(options.type!=='emergency'||r.hazards?.[options.hazard]===true)));}
+function isPublicOperator(operator){return /^(東京都|[^株式有限会社]+(?:区|市|町|村))$/.test(String(operator||'').trim());}
+function distanceKm(a,b){const rad=x=>x*Math.PI/180,dLat=rad(b.lat-a.lat),dLon=rad(b.lng-a.lng),h=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;return 6371*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));}
+function mapUrl(r){const query=Number.isFinite(r.lat)&&Number.isFinite(r.lng)?r.lat+','+r.lng:r.name+' '+r.address;return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);}
+function placeKey(r){return (r.type||'baby')+':'+r.id;}
+function storedPlace(r){return {id:r.id,type:r.type||'baby',name:r.name,address:r.address,lat:r.lat??null,lng:r.lng??null,hazards:r.hazards||null,code:r.code||'',city:r.city||'',updated:r.updated||'',sourceUrl:r.sourceUrl||(r.type?OFFICIAL.gsi:OFFICIAL.baby)};}
+if(typeof module!=='undefined')module.exports={HAZARD_LABELS,TYPE_LABELS,OFFICIAL,normalized,filterPlaces,isPublicOperator,distanceKm,mapUrl,placeKey,storedPlace};
